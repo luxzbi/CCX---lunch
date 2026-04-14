@@ -1535,8 +1535,12 @@ function showNewsBatch(items){
     feed.prepend(wrap);while(feed.children.length>8)feed.removeChild(feed.lastChild);
     // 모바일 뉴스 탭이 열려있으면 실시간 반영
     const mobFeed=g('mobNewsFeed');
-    if(mobFeed&&mobFeed.classList.contains('on'))mobFeed.innerHTML=feed.innerHTML;
-    else{ const dot=g('newsDot');if(dot)dot.classList.add('sh'); }
+    const mobSheet=g('mobNewsSheet');
+    const mobBody=g('mobNewsBody');
+    let updated=false;
+    if(mobFeed&&mobFeed.classList.contains('on')){mobFeed.innerHTML=feed.innerHTML;updated=true;}
+    if(mobSheet&&mobSheet.classList.contains('op')&&mobNewsMode==='news'&&mobBody){mobBody.innerHTML=feed.innerHTML;updated=true;}
+    if(!updated){ const dot=g('newsDot');if(dot)dot.classList.add('sh'); }
   }catch(err){}
 }
 
