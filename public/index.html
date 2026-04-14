@@ -647,6 +647,10 @@ body.light .sinput{background:#f5f9ff}
       <span class="ic nbadge">📰<span class="ndot" id="newsDot"></span></span>
       <span>뉴스</span>
     </button>
+    <button class="mob-nav-btn" id="mnbChat" style="display:none" onclick="openMemberChat()">
+      <span class="ic nbadge">💬<span class="ndot" id="chatDot"></span></span>
+      <span>채팅</span>
+    </button>
   </div>
 </div>
 
@@ -660,6 +664,7 @@ body.light .sinput{background:#f5f9ff}
       <div class="wdot" id="wdot" title="서버 연결 상태"></div>
       <button class="bsm bsa" id="admBtn" style="display:none" onclick="openAdm()">⚙ 관리자</button>
       <span class="uname-chip" id="unameChip">-</span>
+      <button class="bsm" id="chatTopBtn" style="display:none;position:relative" onclick="openMemberChat()" title="관리자 채팅">💬<span id="chatTopDot" style="display:none;position:absolute;top:1px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--rd)"></span></button>
       <button class="bsm gear" onclick="openSettings()" title="개인 설정">⚙</button>
       <button class="bsm" onclick="doLogout()">로그아웃</button>
     </div>
@@ -1013,6 +1018,11 @@ async function initApp(){
   selSym='UPC'; updTicker(); updCH();
   g('unameChip').textContent=(me.displayName||me.username)+(me.isAdmin?' 👑':'');
   if(me.isAdmin) g('admBtn').style.display='';
+  // 일반 회원은 채팅 버튼 표시
+  if(!me.isAdmin){
+    const cb=g('chatTopBtn');if(cb)cb.style.display='';
+    const mb=g('mnbChat');if(mb)mb.style.display='';
+  }
   if(Array.isArray(nR)) nR.slice().reverse().forEach(b=>prepBatch(b));
   document.querySelectorAll('.ar').forEach(r=>r.classList.remove('sel'));
   const s0=g('ar_UPC'); if(s0)s0.classList.add('sel');
@@ -1664,15 +1674,33 @@ function appendChatMsg(m){
   div.innerHTML=`<div>${m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><div class="chat-msg-time">${t}</div>`;
   msgs.appendChild(div);
 }
+/* 일반 회원이 관리자 채팅 여는 함수 */
+function openMemberChat(){
+  if(me?.isAdmin) return; // 관리자는 이 경로 사용 안 함
+  openChat('admin','관리자 👑');
+  // 뱃지 지우기
+  const dot=g('chatDot');if(dot)dot.style.display='none';
+  const topDot=g('chatTopDot');if(topDot)topDot.style.display='none';
+}
+
 function onChatMessage(data){
-  // 현재 열려있는 채팅창과 관련된 메시지면 표시
-  if(!chatTarget) return;
   const myU=me?.username||'';
-  const involved=(data.msg.from===chatTarget)||(data.msg.from===myU&&data.to===chatTarget)||(data.msg.from===myU&&data.to===myU);
-  if(!involved) return;
-  const msgs=g('chatMsgs');
-  appendChatMsg(data.msg);
-  msgs.scrollTop=msgs.scrollHeight;
+  const chatOpen=g('chatOv').style.display!=='none';
+  // 채팅창이 열려있고 해당 대화이면 메시지 추가
+  if(chatOpen && chatTarget){
+    const involved=(data.msg.from===chatTarget)||(data.msg.from===myU&&data.to===chatTarget);
+    if(involved){
+      const msgs=g('chatMsgs');
+      appendChatMsg(data.msg);
+      msgs.scrollTop=msgs.scrollHeight;
+      return;
+    }
+  }
+  // 채팅창이 닫혀있거나 다른 대화 → 뱃지 표시
+  if(data.msg.from!==myU){
+    const dot=g('chatDot');if(dot)dot.style.display='block';
+    const topDot=g('chatTopDot');if(topDot)topDot.style.display='block';
+  }
 }
 async function sendChat(){
   const inp=g('chatInput');
