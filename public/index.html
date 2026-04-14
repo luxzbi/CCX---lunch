@@ -236,7 +236,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 /* 뉴스 패널 (모바일 바텀 시트) */
 .mob-news-sheet{display:none}
 /* 모바일 뉴스 탭 (메인 영역 안) */
-#tNews{display:none}
 .mob-feed-tabs{display:flex;gap:6px;margin-bottom:12px}
 .mob-feed-tab{flex:1;padding:8px;border:1px solid var(--bd);background:transparent;color:var(--mu);font-family:'Space Mono',monospace;font-size:11px;border-radius:var(--rr);cursor:pointer;transition:all .2s}
 .mob-feed-tab.on{border-color:#00f5d4;color:#00f5d4;background:#00f5d412}
@@ -259,8 +258,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
   .sb{display:none!important}
   .rp{display:none!important}
   .mob-nav{display:block}
-  .mn{padding:8px;padding-bottom:68px}
-  .mts{flex-wrap:wrap;gap:4px}
+  .mn{padding:8px;padding-bottom:72px}
+  .mts{flex-wrap:wrap;gap:4px;margin-bottom:8px}
   .mt{padding:4px 8px;font-size:9px}
   .top{padding:0 8px;gap:6px}
   .logo{font-size:10px}
@@ -272,16 +271,31 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
   .cb{height:180px}
   .mg{grid-template-columns:1fr 1fr}
   .mb{height:90px}
+  /* 관리자 패널 */
   #adm .ab{padding:14px}
+  #adm{padding:8px}
   .arow{flex-direction:column}
   .af{min-width:100%}
   .rate-grid{grid-template-columns:1fr 1fr}
   .beg{grid-template-columns:1fr 1fr}
+  /* 랭킹 채팅 버튼 모바일 */
+  .rank-val{flex-direction:column;align-items:flex-end!important;gap:3px!important}
+  /* 탭박스 */
+  .tab-box{padding:12px 10px}
+  /* 뉴스 배치 */
+  .nbatch{padding:7px}
+  .nh{font-size:10px}
+  /* 공지 */
+  .notice-item{padding:10px}
+  .notice-title{font-size:12px}
 }
 @media(max-width:480px){
   .lay{grid-template-columns:1fr!important}
   .mg{grid-template-columns:1fr}
   .mts .mt{font-size:8px;padding:3px 6px}
+  .rank-row{padding:7px 8px;gap:6px}
+  .rank-name{font-size:11px}
+  .rank-krw{font-size:11px}
 }
 
 /* ── 테마: 암흑 (기본) ── */
@@ -307,9 +321,31 @@ body.forest body::before{background-image:linear-gradient(var(--bd)1px,transpare
 body.magic{--bg:#09040f;--pn:#130820;--p2:#1e0d32;--bd:#3a1460;--tx:#e2c0ff;--mu:#7a44aa;--ac:#c97dff;--gn:#9dffb0;--rd:#ff4d88}
 body.magic body::before{background-image:linear-gradient(var(--bd)1px,transparent 1px),linear-gradient(90deg,var(--bd)1px,transparent 1px);opacity:.2}
 
+/* ── 채팅 ── */
+.chat-ov{position:fixed;inset:0;z-index:350;background:#000a;display:flex;align-items:flex-end;justify-content:center;animation:fu .2s ease}
+@media(min-width:769px){.chat-ov{align-items:center}}
+.chat-box{background:var(--pn);border:1px solid var(--bd);border-radius:12px 12px 0 0;width:min(420px,100vw);height:min(520px,85vh);display:flex;flex-direction:column;position:relative}
+@media(min-width:769px){.chat-box{border-radius:12px}}
+.chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.chat-hdr-name{font-weight:700;font-size:13px}
+.chat-hdr-sub{font-size:10px;color:var(--mu);font-family:'Space Mono',monospace}
+.chat-close{background:transparent;border:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1;padding:0 4px}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{max-width:75%;padding:7px 11px;border-radius:10px;font-size:12px;line-height:1.5;word-break:break-all}
+.chat-msg.me{align-self:flex-end;background:#00f5d420;border:1px solid #00f5d440;color:var(--tx)}
+.chat-msg.them{align-self:flex-start;background:var(--p2);border:1px solid var(--bd);color:var(--tx)}
+.chat-msg-time{font-size:9px;color:var(--mu);font-family:'Space Mono',monospace;margin-top:3px;text-align:right}
+.chat-msg.them .chat-msg-time{text-align:left}
+.chat-input-row{display:flex;gap:7px;padding:10px 12px;border-top:1px solid var(--bd);flex-shrink:0}
+.chat-input{flex:1;padding:8px 11px;background:#07111c;border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px;outline:none}
+.chat-input:focus{border-color:#00f5d4}
+.chat-send{padding:8px 14px;background:#00f5d4;color:#000;font-weight:700;border:none;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
+.chat-empty{color:var(--mu);text-align:center;font-size:12px;padding:30px 0;font-family:'Space Mono',monospace}
+.rank-chat-btn{padding:3px 9px;border:1px solid #00f5d4;background:transparent;color:#00f5d4;font-size:9px;font-family:'Space Mono',monospace;border-radius:3px;cursor:pointer;flex-shrink:0}
+.rank-chat-btn:hover{background:#00f5d415}
 /* ── 설정 모달 ── */
 .modal-ov{position:fixed;inset:0;z-index:300;background:#000a;display:flex;align-items:center;justify-content:center;animation:fu .2s ease}
-.modal-box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;width:min(400px,92vw);padding:28px 26px;position:relative}
+.modal-box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;width:min(400px,92vw);padding:28px 26px;position:relative;max-height:90vh;overflow-y:auto}
 .modal-title{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--ac);margin-bottom:20px;letter-spacing:.08em}
 .modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--mu);font-size:18px;cursor:pointer;line-height:1}
 .modal-close:hover{color:var(--tx)}
@@ -520,6 +556,25 @@ body.light .sinput{background:#f5f9ff}
       <div class="smsg err" id="alMsg"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- ── 채팅 모달 ── -->
+<div class="chat-ov" id="chatOv" style="display:none" onclick="if(event.target===this)closeChat()">
+  <div class="chat-box">
+    <div class="chat-hdr">
+      <div>
+        <div class="chat-hdr-name" id="chatTargetName">-</div>
+        <div class="chat-hdr-sub">관리자 1:1 채팅</div>
+      </div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"><div class="chat-empty">메시지가 없습니다</div></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="메시지 입력..." maxlength="200"
+             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"/>
+      <button class="chat-send" onclick="sendChat()">전송</button>
+    </div>
   </div>
 </div>
 
@@ -848,18 +903,33 @@ body.light .sinput{background:#f5f9ff}
 
     <div class="asec">
       <h3>👥 전체 회원 목록</h3>
-      <table class="ut">
-        <thead><tr><th>아이디</th><th>KRW</th><th>UPC</th><th>DWC</th><th>가입일</th></tr></thead>
-        <tbody id="utb"></tbody>
-      </table>
+      <div style="overflow-x:auto">
+        <table class="ut">
+          <thead><tr><th>아이디</th><th>KRW</th><th>UPC</th><th>DWC</th><th>가입일</th><th>상태</th><th>관리</th></tr></thead>
+          <tbody id="utb"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="asec">
+      <h3>🚫 회원 정지 관리</h3>
+      <div class="arow">
+        <div class="af"><label>대상 아이디</label><input id="aBanU" placeholder="정지할 아이디"/></div>
+        <div class="af" style="flex:2"><label>정지 사유</label><input id="aBanR" placeholder="사유 입력 (예: 불공정 거래)"/></div>
+        <button class="ba" style="background:var(--rd);color:#fff" onclick="aBan()">🚫 정지</button>
+        <button class="ba" onclick="aUnban()">✅ 해제</button>
+      </div>
+      <div class="am" id="aBanM"></div>
     </div>
 
     <div class="asec">
       <h3>📋 전체 거래내역 (최근 30건)</h3>
-      <table class="txta">
-        <thead><tr><th>시간</th><th>유저</th><th>자산</th><th>구분</th><th>수량</th><th>금액</th></tr></thead>
-        <tbody id="atxb"></tbody>
-      </table>
+      <div style="overflow-x:auto">
+        <table class="txta">
+          <thead><tr><th>시간</th><th>유저</th><th>자산</th><th>구분</th><th>수량</th><th>금액</th></tr></thead>
+          <tbody id="atxb"></tbody>
+        </table>
+      </div>
     </div>
 
     <div style="text-align:right;margin-top:12px">
@@ -1114,7 +1184,11 @@ function setTheme(t){
 /* ── WebSocket ── */
 function connectWS(){
   ws=new WebSocket(WSU);
-  ws.onopen=()=>g('wdot').className='wdot ok';
+  ws.onopen=()=>{
+    g('wdot').className='wdot ok';
+    // WS 인증: 서버에 토큰 전달
+    if(token) ws.send(JSON.stringify({type:'AUTH',token}));
+  };
   ws.onclose=()=>{ g('wdot').className='wdot er'; setTimeout(connectWS,4000); };
   ws.onerror=()=>g('wdot').className='wdot er';
   ws.onmessage=e=>{
@@ -1138,6 +1212,8 @@ function connectWS(){
       if(m.type==='ANNOUNCE'){ showAnn(m.data?.message||''); return; }
       if(m.type==='NOTICE_NEW'){ prependNotice(m.data); return; }
       if(m.type==='NOTICE_DEL'){ removeNoticeEl(m.data?.id); return; }
+      if(m.type==='CHAT'){ onChatMessage(m.data); return; }
+      if(m.type==='BANNED'){ alert('⛔ 계정이 정지되었습니다.\n사유: '+(m.data?.reason||'관리자에 의해 정지됨')+'\n\n자동으로 로그아웃됩니다.'); doLogout(); return; }
     }catch(err){}
   };
 }
@@ -1406,7 +1482,7 @@ function switchMobFeed(mode){
 
 /* ── 탭 전환 ── */
 function mTab(t,btn){
-  ['Chart','Trade','Bal','Tx','Rank','Notice','News'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'':'none';});
+  ['Chart','Trade','Bal','Tx','Rank','Notice','News'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'block':'none';});
   document.querySelectorAll('.mts .mt').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
   else{ const map={chart:0,trade:1,bal:2,tx:3,rank:4,notice:5};const idx=map[t];const btns=document.querySelectorAll('.mts .mt');if(btns[idx])btns[idx].classList.add('on'); }
@@ -1477,8 +1553,10 @@ async function loadRanking(){
   if(!d||!Array.isArray(d)){el.innerHTML='<div style="color:var(--mu);text-align:center;padding:20px">로드 실패</div>';return;}
   if(!d.length){el.innerHTML='<div style="color:var(--mu);text-align:center;padding:20px">등록된 유저가 없습니다.</div>';return;}
   const top=d[0].total||1;const medals=['🥇','🥈','🥉'];const nCls=['gold','silver','bronze'];const myU=me?.username||'';
+  const isAdmin=me?.isAdmin||false;
   el.innerHTML=d.map((u,i)=>{
     const isMe=u.username===myU,barPct=Math.max(2,Math.round(u.total/top*100));
+    const chatBtn=(isAdmin&&!u.isAdmin)?`<button class="rank-chat-btn" onclick="openChat('${u.username.replace(/'/g,"\\'")}','${(u.displayName||u.username).replace(/'/g,"\\'")}')">💬 채팅</button>`:'';
     return `<div class="rank-row${isMe?' me':''}">
       <div class="rank-num ${nCls[i]||'nn'}">${i+1}</div>
       <div class="rank-medal">${medals[i]||''}</div>
@@ -1486,7 +1564,7 @@ async function loadRanking(){
         <div class="rank-name">${u.displayName||u.username}${u.isAdmin?' 👑':''}${isMe?'<span class="rank-me-tag">나</span>':''}</div>
         <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barPct}%"></div></div>
       </div>
-      <div class="rank-val"><div class="rank-krw">${fmtI(u.total)}원</div></div>
+      <div class="rank-val" style="display:flex;align-items:center;gap:6px">${chatBtn}<div class="rank-krw">${fmtI(u.total)}원</div></div>
     </div>`;
   }).join('');
   if(g('rankUpd'))g('rankUpd').textContent='업데이트: '+new Date().toLocaleTimeString('ko');
@@ -1557,6 +1635,58 @@ function prepFeed(tx){
 }
 function showAnn(m){if(!m)return;const e=g('ann');e.textContent='📢 '+m;e.classList.add('sh');setTimeout(()=>e.classList.remove('sh'),7000);}
 
+/* ── 1:1 채팅 ── */
+let chatTarget='', chatTargetDisplayName='';
+function openChat(username, displayName){
+  chatTarget=username; chatTargetDisplayName=displayName||username;
+  g('chatTargetName').textContent=displayName||username;
+  g('chatOv').style.display='flex';
+  loadChatHistory();
+  setTimeout(()=>g('chatInput').focus(),100);
+}
+function closeChat(){ g('chatOv').style.display='none'; chatTarget=''; }
+async function loadChatHistory(){
+  const msgs=g('chatMsgs');
+  msgs.innerHTML='<div class="chat-empty">불러오는 중...</div>';
+  const d=await GET(`${API}/chat/${chatTarget}`);
+  if(!d||!Array.isArray(d)||!d.length){ msgs.innerHTML='<div class="chat-empty">메시지가 없습니다</div>'; return; }
+  msgs.innerHTML='';
+  d.forEach(m=>appendChatMsg(m));
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function appendChatMsg(m){
+  const msgs=g('chatMsgs');
+  const isMe=m.from===(me?.username||'');
+  const empty=msgs.querySelector('.chat-empty');if(empty)empty.remove();
+  const div=document.createElement('div');
+  div.className='chat-msg '+(isMe?'me':'them');
+  const t=new Date(m.ts).toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML=`<div>${m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><div class="chat-msg-time">${t}</div>`;
+  msgs.appendChild(div);
+}
+function onChatMessage(data){
+  // 현재 열려있는 채팅창과 관련된 메시지면 표시
+  if(!chatTarget) return;
+  const myU=me?.username||'';
+  const involved=(data.msg.from===chatTarget)||(data.msg.from===myU&&data.to===chatTarget)||(data.msg.from===myU&&data.to===myU);
+  if(!involved) return;
+  const msgs=g('chatMsgs');
+  appendChatMsg(data.msg);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+async function sendChat(){
+  const inp=g('chatInput');
+  const text=(inp.value||'').trim();
+  if(!text||!chatTarget) return;
+  inp.value='';
+  // WS로 전송 (빠름), 실패 시 REST fallback
+  if(ws&&ws.readyState===1){
+    ws.send(JSON.stringify({type:'CHAT',to:chatTarget,text}));
+  } else {
+    await POST(`${API}/chat/${chatTarget}`,{text});
+  }
+}
+
 /* ── 관리자 ── */
 function buildAdmSel(){
   const gs=g('aGS');gs.innerHTML='<option value="KRW">KRW (원화)</option>';
@@ -1571,10 +1701,41 @@ function closeAdm(){ g('adm').classList.remove('op'); }
 
 async function loadAdmU(){
   const d=await GET(`${API}/admin/users`);if(!d||d.error)return;
-  g('utb').innerHTML=d.map(u=>`<tr><td style="font-weight:700">${u.username}${u.isAdmin?' 👑':''}</td><td style="color:var(--ac)">${fmtI(u.bal?.KRW||0)}</td><td style="color:#00f5d4">${parseFloat(u.bal?.UPC||0).toFixed(2)}</td><td style="color:#f5a623">${parseFloat(u.bal?.DWC||0).toFixed(2)}</td><td style="color:var(--mu)">${new Date(u.createdAt).toLocaleDateString('ko')}</td></tr>`).join('');
-  const su=g('aSU');su.innerHTML='';d.forEach(u=>{const o=document.createElement('option');o.value=u.username;o.textContent=u.username+(u.isAdmin?' 👑':'');su.appendChild(o);});
+  g('utb').innerHTML=d.map(u=>{
+    const banTd=u.isAdmin?'<td>—</td><td>—</td>'
+      :u.banned
+        ?`<td style="color:var(--rd);font-size:10px">🚫 정지<br><span style="color:var(--mu);font-size:9px">${u.bannedReason||''}</span></td><td><button class="sbtn" style="font-size:9px;padding:2px 7px" onclick="aUnbanDirect('${u.username}')">해제</button></td>`
+        :`<td style="color:var(--gn);font-size:10px">✅ 정상</td><td><button class="sbtn danger" style="font-size:9px;padding:2px 7px" onclick="aBanDirect('${u.username}')">정지</button></td>`;
+    return `<tr style="${u.banned?'opacity:.55':''}"><td style="font-weight:700">${u.username}${u.isAdmin?' 👑':''}</td><td style="color:var(--ac)">${fmtI(u.bal?.KRW||0)}</td><td style="color:#00f5d4">${parseFloat(u.bal?.UPC||0).toFixed(2)}</td><td style="color:#f5a623">${parseFloat(u.bal?.DWC||0).toFixed(2)}</td><td style="color:var(--mu)">${new Date(u.createdAt).toLocaleDateString('ko')}</td>${banTd}</tr>`;
+  }).join('');
+  const su=g('aSU');su.innerHTML='';d.forEach(u=>{const o=document.createElement('option');o.value=u.username;o.textContent=u.username+(u.isAdmin?' 👑':'')+(u.banned?' 🚫':'');su.appendChild(o);});
   const tx=await GET(`${API}/admin/transactions`);
   if(tx)g('atxb').innerHTML=tx.slice(0,30).map(t=>`<tr><td>${new Date(t.ts).toLocaleTimeString('ko')}</td><td>${t.username}</td><td style="color:${assets[t.sym]?.color||'var(--tx)'}">${t.sym}</td><td style="color:${t.action==='buy'?'var(--gn)':'var(--rd)'}">${t.action==='buy'?'▲매수':'▼매도'}</td><td>${t.qty}</td><td>${fmtI(t.total)}원</td></tr>`).join('');
+}
+async function aBan(){
+  const u=g('aBanU').value.trim(),r=g('aBanR').value.trim();
+  if(!u)return;
+  const res=await POST(`${API}/admin/ban`,{targetUsername:u,reason:r});
+  const el=g('aBanM');el.textContent=res?.message||res?.error||'오류';el.className='am'+(res?.error?' er':'');
+  await loadAdmU();
+}
+async function aUnban(){
+  const u=g('aBanU').value.trim();
+  if(!u)return;
+  const res=await POST(`${API}/admin/unban`,{targetUsername:u});
+  const el=g('aBanM');el.textContent=res?.message||res?.error||'오류';el.className='am'+(res?.error?' er':'');
+  await loadAdmU();
+}
+async function aBanDirect(username){
+  const reason=prompt(`${username} 정지 사유 입력:`)||'관리자에 의해 정지됨';
+  const res=await POST(`${API}/admin/ban`,{targetUsername:username,reason});
+  if(res?.error){alert(res.error);return;}
+  await loadAdmU();
+}
+async function aUnbanDirect(username){
+  const res=await POST(`${API}/admin/unban`,{targetUsername:username});
+  if(res?.error){alert(res.error);return;}
+  await loadAdmU();
 }
 
 async function loadRateGrid(){
