@@ -389,7 +389,7 @@ body.light .sinput{background:#f5f9ff}
 <div id="lp">
   <div class="lb">
     <div class="ll">COIN EXCHANGE v4.0</div>
-    <div class="lt"><span class="c1">업핏</span>코인 &amp; <span class="c2">다윗</span>코인 주식 거래소</div>
+    <div class="lt"><span class="c1">업핏</span>코인 &amp; <span class="c2">다윗</span>코인 가상 거래소</div>
     <div class="trow">
       <button class="tb on" onclick="stab('login')">로그인</button>
       <button class="tb" onclick="stab('reg')">회원가입</button>
@@ -741,7 +741,7 @@ body.light .sinput{background:#f5f9ff}
 <div id="adm">
   <div class="ab">
     <div class="at">⚙ <span>관리자</span> 패널</div>
-    <div class="as">학번 10933 전용 · CCX v4.0 · 뉴스 304개</div>
+    <div class="as">관리자 전용 · CCX v4.0 · 뉴스 304개</div>
 
     <div class="asec">
       <h3>📊 기준금리 관리</h3>
@@ -999,12 +999,12 @@ async function savePw(){
 /* ── 설명서 ── */
 const GUIDE_HTML = `
 <div class="guide-h1">🏛️ CCX란?</div>
-<p>CLASS COIN EXCHANGE(CCX)는 학급 내 가상 주식·코인 거래 시뮬레이터입니다. 실제 돈은 사용하지 않으며, 처음 지급된 <b>1,000,000원 + 업핏코인 100개 + 다윗코인 100개</b>로 시작합니다. 뉴스와 시장 흐름을 읽고 매수·매도를 반복해 총자산을 불리는 것이 목표입니다.</p>
+<p>COIN EXCHANGE(CCX)는 가상 주식·코인 거래 시뮬레이션 게임입니다. 실제 돈은 사용하지 않으며, 처음 지급된 <b>1,000,000원 + 업핏코인 100개 + 다윗코인 100개</b>로 시작합니다. 뉴스와 시장 흐름을 읽고 매수·매도를 반복해 총자산을 불리는 것이 목표입니다.</p>
 
 <div class="guide-h1">🪙 코인 — 업핏코인 &amp; 다윗코인의 역사</div>
 
 <div class="guide-h2"><span class="guide-tag coin">COIN</span><span class="guide-sym">UPC</span> 업핏코인 (UpFit Coin)</div>
-<p>2021년 봄, 교실 한구석의 노트북에서 탄생한 최초의 학급 코인. 당시 프로젝트 팀장이었던 '업핏'이 "열심히 하면 오른다"는 신념 하나로 발행했습니다. 초기 발행가는 1,000원. 코인 이름처럼 항상 위를 향하려 하지만, 시장이 항상 그 뜻을 따라주지는 않습니다. 업핏코인은 <b>다윗코인과 역상관관계</b>를 가집니다 — 한쪽이 급등하면 반대쪽에 하락 압력이 가해지는 구조입니다. 활발한 거래량은 단기 모멘텀에 영향을 줍니다.</p>
+<p>2021년 봄, 작은 서버 하나에서 탄생한 최초의 가상 코인. 창립자 '업핏'이 "열심히 하면 오른다"는 신념 하나로 발행했습니다. 초기 발행가는 1,000원. 코인 이름처럼 항상 위를 향하려 하지만, 시장이 항상 그 뜻을 따라주지는 않습니다. 업핏코인은 <b>다윗코인과 역상관관계</b>를 가집니다 — 한쪽이 급등하면 반대쪽에 하락 압력이 가해지는 구조입니다. 활발한 거래량은 단기 모멘텀에 영향을 줍니다.</p>
 
 <div class="guide-h2"><span class="guide-tag special">COIN</span><span class="guide-sym">DWC</span> 다윗코인 (DaWit Coin)</div>
 <p>같은 해 여름, 업핏코인에 맞서 발행된 라이벌 코인. 발행자 '다윗'은 "작은 돌멩이 하나로도 골리앗을 이긴다"며 낮은 초기가(500원)를 고수했습니다. 다윗코인은 업핏코인이 주목받을수록 상대적으로 저평가되는 경향이 있지만, 그만큼 반등할 여지도 큽니다. 두 코인의 <b>모멘텀은 서로를 상쇄</b>하므로, 동시에 매수하는 전략은 리스크를 분산시킵니다.</p>
@@ -1015,7 +1015,7 @@ const GUIDE_HTML = `
 <p>2003년 설립된 정제·탐사 전문 에너지 기업. 북해와 동해 해저 유전 개발로 이름을 알렸으며, OPEC+ 감산 합의의 직접 수혜주입니다. 유가 상승기엔 폭발적인 실적을 내지만, 공급 과잉 국면에서는 빠르게 조정받는 고베타 종목입니다.</p>
 
 <div class="guide-h2"><span class="guide-tag stock">석유</span><span class="guide-sym">PTKO</span> 페트로클라스</div>
-<p>1997년 창립된 정유·화학 복합 기업. 안정적인 정제 마진을 기반으로 배당을 꾸준히 지급해 '학급의 배당주'로 불립니다. 오일맥스보다 변동성이 낮아 방어적 포트폴리오에 적합합니다.</p>
+<p>1997년 창립된 정유·화학 복합 기업. 안정적인 정제 마진을 기반으로 배당을 꾸준히 지급해 'CCX의 배당주'로 불립니다. 오일맥스보다 변동성이 낮아 방어적 포트폴리오에 적합합니다.</p>
 
 <div class="guide-h2"><span class="guide-tag stock">반도체</span><span class="guide-sym">NANO</span> 나노칩</div>
 <p>2015년 스텔스 스타트업으로 출발해 3나노 공정 기술로 업계를 놀라게 한 팹리스 기업. AI 가속기 칩 시장의 급성장으로 매출이 폭발적으로 늘었습니다. 높은 성장성만큼 뉴스에 민감하게 반응하는 고변동 종목입니다.</p>
