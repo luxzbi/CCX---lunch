@@ -244,7 +244,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 /* 모바일 하단 네비게이션 */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:140;height:56px;background:#050a0fef;border-top:1px solid var(--bd);backdrop-filter:blur(10px)}
 .mob-nav-inner{display:flex;height:100%}
-.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:transparent;border:none;color:var(--mu);font-size:9px;font-family:'Space Mono',monospace;cursor:pointer;transition:color .2s;border-right:1px solid var(--bd);padding:0}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--mu);font-size:8px;font-family:'Space Mono',monospace;cursor:pointer;transition:color .2s;border-right:1px solid var(--bd);padding:0 2px}
 .mob-nav-btn:last-child{border-right:none}
 .mob-nav-btn .ic{font-size:18px;line-height:1}
 .mob-nav-btn.act{color:#00f5d4}
@@ -1497,7 +1497,7 @@ function mTab(t,btn){
   if(btn)btn.classList.add('on');
   else{ const map={chart:0,trade:1,bal:2,tx:3,rank:4,notice:5};const idx=map[t];const btns=document.querySelectorAll('.mts .mt');if(btns[idx])btns[idx].classList.add('on'); }
   // 모바일 네비 활성화
-  ['mnbChart','mnbTrade','mnbBal','mnbNews'].forEach(id=>{const b=g(id);if(b)b.classList.remove('act');});
+  ['mnbChart','mnbTrade','mnbBal','mnbNews','mnbChat'].forEach(id=>{const b=g(id);if(b)b.classList.remove('act');});
   if(t==='chart'&&g('mnbChart'))g('mnbChart').classList.add('act');
   if(t==='trade'&&g('mnbTrade'))g('mnbTrade').classList.add('act');
   if(t==='bal'&&g('mnbBal'))g('mnbBal').classList.add('act');
