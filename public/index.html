@@ -234,11 +234,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .mob-drawer-hdr span{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--mu);text-transform:uppercase}
 .mob-drawer-hdr button{background:transparent;border:none;color:var(--mu);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1}
 /* 뉴스 패널 (모바일 바텀 시트) */
-.mob-news-sheet{position:fixed;bottom:56px;left:0;right:0;z-index:155;background:var(--pn);border-top:1px solid var(--bd);border-radius:16px 16px 0 0;max-height:72vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding:0 12px 12px}
-.mob-news-sheet.op{transform:translateY(0)}
-.mob-news-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;position:sticky;top:0;background:var(--pn);border-bottom:1px solid var(--bd);margin-bottom:8px}
-.mob-news-hdr span{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--mu);text-transform:uppercase}
-.mob-news-hdr button{background:transparent;border:none;color:var(--mu);font-size:16px;cursor:pointer;padding:2px 8px}
+.mob-news-sheet{display:none}
+/* 모바일 뉴스 탭 (메인 영역 안) */
+#tNews{display:none}
+.mob-feed-tabs{display:flex;gap:6px;margin-bottom:12px}
+.mob-feed-tab{flex:1;padding:8px;border:1px solid var(--bd);background:transparent;color:var(--mu);font-family:'Space Mono',monospace;font-size:11px;border-radius:var(--rr);cursor:pointer;transition:all .2s}
+.mob-feed-tab.on{border-color:#00f5d4;color:#00f5d4;background:#00f5d412}
+#mobNewsFeed,#mobTradeFeed{display:none}
+#mobNewsFeed.on,#mobTradeFeed.on{display:block}
 /* 모바일 하단 네비게이션 */
 .mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:140;height:56px;background:#050a0fef;border-top:1px solid var(--bd);backdrop-filter:blur(10px)}
 .mob-nav-inner{display:flex;height:100%}
@@ -585,7 +588,7 @@ body.light .sinput{background:#f5f9ff}
       <span class="ic">💼</span>
       <span>잔고</span>
     </button>
-    <button class="mob-nav-btn" id="mnbNews" onclick="toggleMobNews('news')">
+    <button class="mob-nav-btn" id="mnbNews" onclick="mTab('news',null)">
       <span class="ic nbadge">📰<span class="ndot" id="newsDot"></span></span>
       <span>뉴스</span>
     </button>
@@ -710,6 +713,16 @@ body.light .sinput{background:#f5f9ff}
           </div>
           <div id="rankList"><div style="color:var(--mu);text-align:center;padding:20px;font-size:12px">랭킹을 불러오는 중...</div></div>
         </div>
+      </div>
+
+      <!-- 뉴스/거래피드 (모바일 전용 탭) -->
+      <div id="tNews" style="display:none">
+        <div class="mob-feed-tabs">
+          <button class="mob-feed-tab on" id="mfTabNews" onclick="switchMobFeed('news')">📰 뉴스 피드</button>
+          <button class="mob-feed-tab" id="mfTabFeed" onclick="switchMobFeed('feed')">⚡ 거래피드</button>
+        </div>
+        <div id="mobNewsFeed" class="on"></div>
+        <div id="mobTradeFeed"></div>
       </div>
 
       <!-- 공지 -->
@@ -1379,17 +1392,30 @@ async function loadTx(){
   g('txb').innerHTML=d.map(tx=>{ const a=assets[tx.sym];const color=a?.color||'var(--tx)';const name=a?.name||tx.sym;const isBuy=tx.action==='buy';const qStr=parseFloat(tx.qty)>=1?fmtI(tx.qty):parseFloat(tx.qty).toFixed(4);return `<tr><td style="font-family:'Space Mono',monospace;white-space:nowrap">${new Date(tx.ts).toLocaleTimeString('ko')}</td><td style="font-weight:700;color:${color}">${tx.sym}</td><td>${name}</td><td style="font-weight:700;color:${isBuy?'var(--gn)':'var(--rd)'}">${isBuy?'▲ 매수':'▼ 매도'}</td><td style="font-family:'Space Mono',monospace;text-align:right">${qStr}</td><td style="font-family:'Space Mono',monospace;text-align:right">${fmt(tx.price)}원</td><td style="font-family:'Space Mono',monospace;text-align:right;font-weight:700;color:${isBuy?'var(--rd)':'var(--gn)'}">${isBuy?'−':'+'}${fmtI(tx.total)}원</td></tr>`; }).join('');
 }
 
+/* ── 모바일 뉴스/거래피드 탭 전환 ── */
+function switchMobFeed(mode){
+  const isNews=mode==='news';
+  g('mfTabNews').classList.toggle('on',isNews);
+  g('mfTabFeed').classList.toggle('on',!isNews);
+  g('mobNewsFeed').classList.toggle('on',isNews);
+  g('mobTradeFeed').classList.toggle('on',!isNews);
+  if(isNews){ const nf=g('nf'); if(nf&&g('mobNewsFeed'))g('mobNewsFeed').innerHTML=nf.innerHTML; }
+  else       { const tf2=g('tf2'); if(tf2&&g('mobTradeFeed'))g('mobTradeFeed').innerHTML=tf2.innerHTML; }
+  g('newsDot').classList.remove('sh');
+}
+
 /* ── 탭 전환 ── */
 function mTab(t,btn){
-  ['Chart','Trade','Bal','Tx','Rank','Notice'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'':'none';});
+  ['Chart','Trade','Bal','Tx','Rank','Notice','News'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'':'none';});
   document.querySelectorAll('.mts .mt').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
   else{ const map={chart:0,trade:1,bal:2,tx:3,rank:4,notice:5};const idx=map[t];const btns=document.querySelectorAll('.mts .mt');if(btns[idx])btns[idx].classList.add('on'); }
   // 모바일 네비 활성화
-  ['mnbChart','mnbTrade','mnbBal'].forEach(id=>{const b=g(id);if(b)b.classList.remove('act');});
+  ['mnbChart','mnbTrade','mnbBal','mnbNews'].forEach(id=>{const b=g(id);if(b)b.classList.remove('act');});
   if(t==='chart'&&g('mnbChart'))g('mnbChart').classList.add('act');
   if(t==='trade'&&g('mnbTrade'))g('mnbTrade').classList.add('act');
   if(t==='bal'&&g('mnbBal'))g('mnbBal').classList.add('act');
+  if(t==='news'&&g('mnbNews')){ g('mnbNews').classList.add('act'); switchMobFeed('news'); }
   if(t==='chart')setTimeout(()=>{if(mChart){chartReady=false;tryDrawChart();}drawMinis();},100);
   if(t==='bal')GET(`${API}/me`).then(d=>{if(d&&!d.error){me=d;updBal();}});
   if(t==='tx')loadTx();
@@ -1507,17 +1533,24 @@ function showNewsBatch(items){
     wrap.innerHTML=`<div class="nbtime">📰 ${new Date(ts).toLocaleTimeString('ko')} 뉴스 ${items.length}건 발표</div>`;
     items.forEach(n=>{if(!n)return;const tags=(Array.isArray(n.a)?n.a:[]).map((s,i)=>{const imp=typeof n.imp?.[i]==='number'?n.imp[i]:0;return `<span class="ntg ${imp>=0?'u':'d'}">${s} ${imp>=0?'+':''}${(imp*100).toFixed(1)}%</span>`;}).join('');const ni=document.createElement('div');ni.className='ni';ni.innerHTML=`<div class="nh">${n.i||'📰'} ${n.h||''}</div><div class="ntgs">${tags}</div>`;wrap.appendChild(ni);});
     feed.prepend(wrap);while(feed.children.length>8)feed.removeChild(feed.lastChild);
-    // 모바일 뉴스 시트 갱신
-    const mobSheet=g('mobNewsSheet'),mobBody=g('mobNewsBody');
-    if(mobSheet&&mobBody){
-      if(mobSheet.classList.contains('op')&&mobNewsMode==='news')mobBody.innerHTML=feed.innerHTML;
-      else{ const dot=g('newsDot');if(dot&&!mobSheet.classList.contains('op'))dot.classList.add('sh'); }
-    }
+    // 모바일 뉴스 탭이 열려있으면 실시간 반영
+    const mobFeed=g('mobNewsFeed');
+    if(mobFeed&&mobFeed.classList.contains('on'))mobFeed.innerHTML=feed.innerHTML;
+    else{ const dot=g('newsDot');if(dot)dot.classList.add('sh'); }
   }catch(err){}
 }
 
 /* ── 거래피드·공지 배너 ── */
-function prepFeed(tx){if(!tx)return;const f=g('tf2');const c=tx.action==='buy'?'by':'sl';const d=document.createElement('div');d.className='fr';d.innerHTML=`<div><div class="fw">${tx.username||'?'}</div><div class="fd ${c}">${tx.action==='buy'?'▲매수':'▼매도'} ${tx.qty} ${tx.sym}</div></div><div style="text-align:right"><div style="font-size:10px;font-family:'Space Mono',monospace">${fmtI(tx.total||0)}원</div><div style="font-size:9px;color:var(--mu)">${new Date(tx.ts||Date.now()).toLocaleTimeString('ko')}</div></div>`;f.prepend(d);if(f.children.length>15)f.removeChild(f.lastChild);const mobSheet=g('mobNewsSheet'),mobBody=g('mobNewsBody');if(mobSheet&&mobBody&&mobSheet.classList.contains('op')&&mobNewsMode==='feed')mobBody.innerHTML=f.innerHTML;}
+function prepFeed(tx){
+  if(!tx)return;
+  const f=g('tf2');const c=tx.action==='buy'?'by':'sl';
+  const d=document.createElement('div');d.className='fr';
+  d.innerHTML=`<div><div class="fw">${tx.username||'?'}</div><div class="fd ${c}">${tx.action==='buy'?'▲매수':'▼매도'} ${tx.qty} ${tx.sym}</div></div><div style="text-align:right"><div style="font-size:10px;font-family:'Space Mono',monospace">${fmtI(tx.total||0)}원</div><div style="font-size:9px;color:var(--mu)">${new Date(tx.ts||Date.now()).toLocaleTimeString('ko')}</div></div>`;
+  f.prepend(d);if(f.children.length>15)f.removeChild(f.lastChild);
+  // 모바일 거래피드 탭이 열려있으면 실시간 반영
+  const mobTf=g('mobTradeFeed');
+  if(mobTf&&mobTf.classList.contains('on'))mobTf.innerHTML=f.innerHTML;
+}
 function showAnn(m){if(!m)return;const e=g('ann');e.textContent='📢 '+m;e.classList.add('sh');setTimeout(()=>e.classList.remove('sh'),7000);}
 
 /* ── 관리자 ── */

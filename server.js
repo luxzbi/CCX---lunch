@@ -333,7 +333,7 @@ NP('[국부펀드] 국부펀드, 국내 주식 비중 5%p 확대','💼',['NANO'
 NP('[필립스 곡선] "고용 호조에도 물가 안정" — 경기 연착륙 기대','📊',['SVCO','MKFL','FSKL'],[[0.01,0.03],[0.01,0.03],[0.01,0.03]]),
 /* ──────────── 코인 전용 ──────────── */
 NP('[업핏코인] 가상자산 규제 완화 법안 통과 — 기관 투자 허용','✅',['UPC'],[[0.07,0.17]]),
-NP('[다윗코인] 학급 내 희소성 부각 — 발행량 제한 재확인','💎',['DWC'],[[0.06,0.14]]),
+NP('[다윗코인] 희소성 부각 — 발행량 제한 재확인','💎',['DWC'],[[0.06,0.14]]),
 NP('[업핏코인] 거래소 해킹 사고 — 일시 유통 중단','🔓',['UPC'],[[-0.12,-0.04]]),
 NP('[다윗코인] 고래 지갑 대규모 매도 출현','🐋',['DWC'],[[-0.10,-0.03]]),
 NP('[업핏코인] 대형 기관투자자 매수 포지션 공개','🏛️',['UPC'],[[0.08,0.17]]),
@@ -464,6 +464,22 @@ const USERS = new Map(); // username → user obj
 const TXS   = [];       // 전체 거래 내역
 const NHIST = [];       // 뉴스 히스토리 (배치 단위)
 
+/* ── 파일 DB: 유저 영속 저장 ── */
+const DB_FILE=path.join(__dirname,'users_db.json');
+function loadUsers(){
+  try{
+    if(fs.existsSync(DB_FILE)){
+      const data=JSON.parse(fs.readFileSync(DB_FILE,'utf-8'));
+      data.forEach(u=>USERS.set(u.username,u));
+      console.log(`✅ 유저 ${data.length}명 로드`);
+    }
+  }catch(e){console.error('유저 DB 로드 실패:',e.message);}
+}
+function saveUsers(){
+  try{fs.writeFileSync(DB_FILE,JSON.stringify([...USERS.values()],null,2));}
+  catch(e){console.error('유저 DB 저장 실패:',e.message);}
+}
+
 function mkBal(isAdmin){
   const b={KRW: isAdmin ? 50_000_000 : 1_000_000};
   Object.keys(ASSETS).forEach(s=>{ b[s]=(s==='UPC'||s==='DWC')?(isAdmin?10000:100):0; });
@@ -508,7 +524,7 @@ if(!USERS.has('admin')){
   const now=Date.now();
   Object.values(ASSETS).forEach(a=>{
     let p=a.base;
-    for(let i=120;i>=0;i--){
+    for(let i=400;i>=0;i--){
       p=Math.max(a.minPrice||1,Math.min(a.maxPrice||p*100,p*(1+(Math.random()-0.495)*a.v)));
       a.hist.push({t:now-i*2000,p:+p.toFixed(2)});
     }
@@ -819,22 +835,6 @@ app.post('/api/admin/resetall',adm,(req,res)=>{
   broadcast({type:'ANNOUNCE',data:{message:`💰 전체 자금이 초기화되었습니다! (${cnt}명)`,ts:Date.now()}});
   res.json({message:`${cnt}명 자금 초기화 완료`});
 });
-
-/* ── 파일 DB: 유저 영속 저장 ── */
-const DB_FILE=path.join(__dirname,'users_db.json');
-function loadUsers(){
-  try{
-    if(fs.existsSync(DB_FILE)){
-      const data=JSON.parse(fs.readFileSync(DB_FILE,'utf-8'));
-      data.forEach(u=>USERS.set(u.username,u));
-      console.log(`✅ 유저 ${data.length}명 로드`);
-    }
-  }catch(e){console.error('유저 DB 로드 실패:',e.message);}
-}
-function saveUsers(){
-  try{fs.writeFileSync(DB_FILE,JSON.stringify([...USERS.values()],null,2));}
-  catch(e){console.error('유저 DB 저장 실패:',e.message);}
-}
 
 app.get('/api/news',(req,res)=>res.json(NHIST.slice(0,10)));
 
