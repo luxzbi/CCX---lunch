@@ -24,7 +24,13 @@ const app    = express();
 const server = http.createServer(app);
 const wss    = new WebSocket.Server({ server });
 
-const SECRET   = process.env.JWT_SECRET || 'ccx_secret_2025_CHANGE_ME';
+// ✅ 보안: 운영 환경에서는 반드시 환경변수로 설정 (.env 파일 사용)
+const SECRET = process.env.JWT_SECRET || (() => {
+  if(process.env.NODE_ENV === 'production')
+    throw new Error('❌ JWT_SECRET 환경변수가 설정되지 않았습니다. .env 파일을 확인하세요.');
+  console.warn('⚠️  JWT_SECRET 미설정 — 개발용 임시 시크릿 사용 중. 운영 서버에서는 .env에 설정하세요.');
+  return 'ccx_secret_DEV_ONLY_do_not_use_in_prod';
+})();
 const ADMIN_ID = '10933';
 const PORT     = process.env.PORT || 3000;
 const PUB      = fs.existsSync(path.join(__dirname,'public'))
@@ -65,7 +71,11 @@ app.use((req, res, next) => {
 });
 app.use(express.static(PUB));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'ccx_session_secret_2025',
+  secret: process.env.SESSION_SECRET || (() => {
+    if(process.env.NODE_ENV === 'production')
+      throw new Error('❌ SESSION_SECRET 환경변수가 설정되지 않았습니다.');
+    return 'ccx_session_DEV_ONLY';
+  })(),
   resave: false,
   saveUninitialized: false,
 }));
@@ -1195,6 +1205,9 @@ app.post('/api/board', auth, (req, res) => {
   if(!trimmed && !imageData) return res.status(400).json({error:'내용 또는 사진을 입력하세요.'});
   // 이미지 크기 제한 300KB(base64)
   if(imageData && imageData.length > 400000) return res.status(400).json({error:'사진이 너무 큽니다. (최대 300KB)'});
+  // ✅ 보안: 이미지 MIME 타입 검증 (image/* 외 차단)
+  if(imageData && !/^data:image\/(jpeg|jpg|png|gif|webp|bmp);base64,/.test(imageData))
+    return res.status(400).json({error:'지원하지 않는 파일 형식입니다. (jpg, png, gif, webp만 가능)'});
   const post = {
     id: uuid(),
     username: u.username,
@@ -1331,6 +1344,31 @@ app.delete('/api/admin/reports/:id', adm, (req, res) => {
 });
 
 /* ═══════════════════════════════════════════════════════
+   1회용 인증 코드 저장소 (OAuth 토큰 URL 노출 방지)
+   코드 → {token, expiresAt}  /  30초 TTL
+═══════════════════════════════════════════════════════ */
+const AUTH_CODES = new Map(); // code → {token, expiresAt}
+
+// 만료 코드 주기적 정리
+setInterval(()=>{
+  const now=Date.now();
+  for(const [k,v] of AUTH_CODES.entries()){
+    if(v.expiresAt < now) AUTH_CODES.delete(k);
+  }
+}, 60_000);
+
+/* 코드 교환: POST /api/auth/exchange  →  {token} */
+app.post('/api/auth/exchange', (req,res)=>{
+  const {code}=req.body;
+  if(!code) return res.status(400).json({error:'코드 없음'});
+  const entry=AUTH_CODES.get(code);
+  if(!entry) return res.status(401).json({error:'유효하지 않은 코드입니다.'});
+  if(entry.expiresAt < Date.now()){ AUTH_CODES.delete(code); return res.status(401).json({error:'코드가 만료되었습니다. 다시 로그인해 주세요.'}); }
+  AUTH_CODES.delete(code); // 1회 사용 후 즉시 삭제
+  res.json({token: entry.token});
+});
+
+/* ═══════════════════════════════════════════════════════
    Google OAuth 라우트
 ═══════════════════════════════════════════════════════ */
 
@@ -1341,7 +1379,7 @@ app.get('/api/auth/google',
 
 // 2) Google 콜백
 app.get('/api/auth/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: process.env.AUTH_FAILURE_REDIRECT || '/login?error=google_failed' }),
+  passport.authenticate('google', { session: false, failureRedirect: process.env.AUTH_FAILURE_REDIRECT || '/?error=google_failed' }),
   (req, res) => {
     const u = req.user;
     const token = jwt.sign(
@@ -1349,9 +1387,11 @@ app.get('/api/auth/google/callback',
       SECRET,
       { expiresIn: '8h' }
     );
+    // ✅ 보안: JWT를 URL에 직접 노출하지 않고 1회용 코드로 교환
+    const code = require('crypto').randomBytes(32).toString('hex');
+    AUTH_CODES.set(code, { token, expiresAt: Date.now() + 30_000 }); // 30초 유효
     const redirect = process.env.AUTH_SUCCESS_REDIRECT || '/';
-    // JWT를 쿼리스트링으로 전달 → 클라이언트에서 localStorage에 저장
-    res.redirect(`${redirect}?token=${token}`);
+    res.redirect(`${redirect}?authCode=${code}`);
   }
 );
 
