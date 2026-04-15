@@ -1317,7 +1317,7 @@ function stab(t){
   g('lmsg').textContent='';
 }
 /* ── Google OAuth 콜백 토큰 자동 처리 ── */
-(function(){
+(async function(){
   // ✅ 보안: 1회용 authCode만 허용 — URL에 JWT 직접 노출 없음
   const p=new URLSearchParams(location.search);
   const authCode=p.get('authCode');
@@ -1325,7 +1325,7 @@ function stab(t){
     history.replaceState(null,'','/'); // 코드 즉시 주소창에서 제거
     const r=await POST(`${API}/auth/exchange`,{code:authCode});
     if(r?.token){ localStorage.setItem('ccx_t',r.token); token=r.token; }
-    else{ lmsg('Google 로그인 실패. 다시 시도해주세요.'); }
+    else{ window.addEventListener('DOMContentLoaded',()=>lmsg('Google 로그인 실패. 다시 시도해주세요.')); }
   }
   const err=p.get('error');
   if(err){
