@@ -39,6 +39,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .bg:hover{box-shadow:0 2px 12px #ffffff30}
 .bg svg{width:18px;height:18px;flex-shrink:0}
 
+/* ── 정지 화면 ── */
+#bannedScreen{display:flex;flex-direction:column;gap:0}
+.banned-icon{font-size:38px;text-align:center;margin-bottom:10px}
+.banned-badge{display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--rd) 14%,transparent);border:1px solid color-mix(in srgb,var(--rd) 40%,transparent);color:var(--rd);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;font-family:'Space Mono',monospace;margin-bottom:14px;align-self:flex-start}
+.banned-reason-box{background:var(--p2);border:1px solid var(--bd);border-radius:6px;padding:10px 13px;margin-bottom:16px}
+.banned-reason-label{font-size:9px;font-family:'Space Mono',monospace;color:var(--mu);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.banned-reason-text{font-size:13px;color:var(--tx);line-height:1.6;word-break:break-all}
+.banned-msg-label{font-size:10px;font-family:'Space Mono',monospace;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.banned-textarea{width:100%;padding:9px 11px;background:var(--p2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;resize:none;height:80px;line-height:1.5;margin-bottom:8px}
+.banned-textarea:focus{border-color:var(--ac)}
+.banned-send{width:100%;padding:10px;background:var(--ac);color:var(--bg);font-weight:700;font-size:13px;border:none;border-radius:var(--rr);cursor:pointer;transition:opacity .2s}
+.banned-send:hover{opacity:.85}
+.banned-back{width:100%;padding:8px;background:transparent;color:var(--mu);font-size:12px;font-family:'Space Mono',monospace;border:1px solid var(--bd);border-radius:var(--rr);cursor:pointer;margin-top:7px;transition:all .2s}
+.banned-back:hover{border-color:var(--tx);color:var(--tx)}
+.banned-msg{font-size:11px;min-height:16px;text-align:center;font-family:'Space Mono',monospace;margin-top:6px;color:var(--gn)}
+.banned-msg.err{color:var(--rd)}
+
 /* ── APP ── */
 #app{display:none;min-height:100vh;position:relative;z-index:1}
 
@@ -109,8 +126,8 @@ body.has-bg .rank-row{background:color-mix(in srgb,var(--pn) 65%,transparent)!im
 .cc.u{color:var(--gn)}.cc.d{color:var(--rd)}
 .cb{background:var(--pn);border:1px solid var(--bd);border-radius:var(--rr);padding:12px;height:240px;position:relative}
 #mcCandle{width:100%;height:100%;display:block;cursor:crosshair}
-.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
-.mb{background:var(--pn);border:1px solid var(--bd);border-radius:var(--rr);padding:9px;height:115px;position:relative}
+.mg{display:grid;grid-template-columns:1fr;gap:8px;margin-top:6px}
+.mb{background:var(--pn);border:1px solid var(--bd);border-radius:var(--rr);padding:9px;height:90px;position:relative}
 .ml{font-size:9px;font-family:'Space Mono',monospace;margin-bottom:3px}
 
 /* trade */
@@ -288,8 +305,8 @@ body.has-bg .rank-row{background:color-mix(in srgb,var(--pn) 65%,transparent)!im
   .ch{flex-direction:column;gap:6px}
   .cp{font-size:22px}
   .cb{height:180px}
-  .mg{grid-template-columns:1fr 1fr}
-  .mb{height:90px}
+  .mg{grid-template-columns:1fr}
+  .mb{height:80px}
   /* 관리자 패널 */
   #adm .ab{padding:14px}
   #adm{padding:8px}
@@ -307,6 +324,19 @@ body.has-bg .rank-row{background:color-mix(in srgb,var(--pn) 65%,transparent)!im
   /* 공지 */
   .notice-item{padding:10px}
   .notice-title{font-size:12px}
+  /* 자유 게시판 */
+  .board-form{padding:10px}
+  .board-post{padding:10px 11px}
+  .board-post-img{max-height:220px}
+  /* 채팅 인박스 */
+  .inbox-ov{padding:54px 8px 0;align-items:flex-start;justify-content:stretch}
+  .inbox-box{width:100%;max-height:65vh}
+  /* 프로필 모달 */
+  .profile-box{padding:20px 16px}
+  /* 신고 모달 */
+  .report-box{padding:18px 16px}
+  /* 정지 화면 */
+  #bannedOv .lb{padding:24px 18px}
 }
 @media(max-width:480px){
   .lay{grid-template-columns:1fr!important}
@@ -364,6 +394,89 @@ body.sunset body::before{background-image:linear-gradient(var(--bd)1px,transpare
 /* ── 테마: 체리블로섬 ── */
 body.cherry{--bg:#0e0509;--pn:#1e0a14;--p2:#2e101e;--bd:#7a2050;--tx:#ffc0d8;--mu:#aa5078;--ac:#ff80b0;--gn:#ff9ec4;--rd:#ff3366}
 body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transparent 1px),linear-gradient(90deg,var(--bd)1px,transparent 1px);background-size:40px 40px;opacity:.18}
+
+/* ── 관리자 채팅 인박스 ── */
+.inbox-ov{position:fixed;inset:0;z-index:350;background:#000a;display:flex;align-items:flex-start;justify-content:flex-end;padding:54px 16px 0;animation:fu .2s ease}
+.inbox-box{background:var(--pn);border:1px solid var(--bd);border-radius:10px;width:min(340px,95vw);max-height:420px;display:flex;flex-direction:column;box-shadow:0 8px 32px #0008}
+.inbox-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.inbox-hdr-title{font-weight:700;font-size:13px}
+.inbox-list{overflow-y:auto;flex:1}
+.inbox-row{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .12s}
+.inbox-row:hover{background:var(--p2)}
+.inbox-row:last-child{border-bottom:none}
+.inbox-row.unread{background:color-mix(in srgb,var(--ac) 6%,transparent)}
+.inbox-avatar{width:34px;height:34px;border-radius:50%;background:var(--p2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;position:relative}
+.inbox-avatar .online-ring{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;border:2px solid var(--pn)}
+.inbox-avatar .online-ring.on{background:var(--gn)}
+.inbox-avatar .online-ring.off{background:var(--mu)}
+.inbox-info{flex:1;min-width:0}
+.inbox-name{font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px}
+.inbox-preview{font-size:10px;color:var(--mu);font-family:'Space Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.inbox-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.inbox-time{font-size:9px;color:var(--mu);font-family:'Space Mono',monospace}
+.inbox-badge{background:var(--rd);color:#fff;font-size:9px;font-family:'Space Mono',monospace;border-radius:10px;padding:1px 6px;font-weight:700}
+.inbox-empty{color:var(--mu);text-align:center;padding:30px 0;font-size:12px;font-family:'Space Mono',monospace}
+
+/* ── 자유 게시판 (메인 탭) ── */
+.board-wrap{display:flex;flex-direction:column;gap:10px}
+.board-form{background:var(--pn);border:1px solid var(--bd);border-radius:var(--rr);padding:13px;display:flex;flex-direction:column;gap:8px}
+.board-form-title{font-size:9px;font-family:'Space Mono',monospace;letter-spacing:.15em;color:var(--mu);text-transform:uppercase;margin-bottom:2px}
+.board-textarea{width:100%;padding:9px 11px;background:var(--p2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;resize:vertical;min-height:72px;line-height:1.6}
+.board-textarea:focus{border-color:var(--ac)}
+.board-form-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.board-img-label{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:11px;color:var(--mu);font-family:'Space Mono',monospace;transition:all .2s;flex-shrink:0;white-space:nowrap}
+.board-img-label:hover{border-color:var(--ac);color:var(--ac)}
+.board-img-preview{max-height:60px;max-width:120px;border-radius:4px;border:1px solid var(--bd);display:none;object-fit:contain}
+.board-img-clear{background:none;border:none;color:var(--rd);cursor:pointer;font-size:14px;padding:0 2px;display:none}
+.board-submit{padding:7px 18px;background:var(--ac);color:var(--bg);font-weight:700;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:auto;white-space:nowrap}
+.board-submit:hover{opacity:.85}
+.board-list{display:flex;flex-direction:column;gap:10px}
+.board-post{background:var(--pn);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;animation:fi .3s ease}
+.board-post-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:6px}
+.board-post-name{font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.board-post-meta{display:flex;align-items:center;gap:8px}
+.board-post-time{font-size:9px;color:var(--mu);font-family:'Space Mono',monospace;white-space:nowrap}
+.board-post-text{font-size:13px;line-height:1.7;word-break:break-word;white-space:pre-wrap;margin-bottom:4px}
+.board-post-text a{color:var(--ac);text-decoration:underline}
+.board-post-img{max-width:100%;border-radius:6px;border:1px solid var(--bd);margin-top:6px;display:block;cursor:zoom-in;max-height:400px;object-fit:contain}
+.board-post-del{background:none;border:none;color:var(--mu);cursor:pointer;font-size:13px;padding:0 3px;flex-shrink:0;transition:color .15s}
+.board-post-del:hover{color:var(--rd)}
+.board-empty{color:var(--mu);text-align:center;padding:40px 0;font-size:12px;font-family:'Space Mono',monospace}
+.board-count{font-size:9px;color:var(--mu);font-family:'Space Mono',monospace}
+/* 이미지 확대 */
+.img-zoom-ov{position:fixed;inset:0;z-index:600;background:#000d;display:flex;align-items:center;justify-content:center;cursor:zoom-out;animation:fu .15s ease}
+.img-zoom-ov img{max-width:92vw;max-height:92vh;border-radius:8px;box-shadow:0 0 60px #000a}
+
+/* ── 신고 모달 ── */
+.report-ov{position:fixed;inset:0;z-index:400;background:#000b;display:flex;align-items:center;justify-content:center;animation:fu .2s ease}
+.report-box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;width:min(320px,92vw);padding:22px 20px;position:relative}
+.report-title{font-size:13px;font-weight:700;margin-bottom:4px;color:var(--rd)}
+.report-target{font-size:11px;color:var(--mu);font-family:'Space Mono',monospace;margin-bottom:16px}
+.report-label{font-size:10px;font-family:'Space Mono',monospace;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.report-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.report-option{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--bd);border-radius:6px;cursor:pointer;transition:all .15s;font-size:12px}
+.report-option:hover{border-color:var(--rd);background:color-mix(in srgb,var(--rd) 6%,transparent)}
+.report-option.selected{border-color:var(--rd);background:color-mix(in srgb,var(--rd) 10%,transparent);color:var(--rd)}
+.report-option input[type=radio]{accent-color:var(--rd);flex-shrink:0}
+.report-custom{width:100%;padding:8px 10px;background:var(--p2);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-size:12px;outline:none;margin-bottom:10px;display:none}
+.report-custom:focus{border-color:var(--rd)}
+.report-submit{width:100%;padding:9px;background:var(--rd);color:#fff;font-weight:700;border:none;border-radius:6px;cursor:pointer;font-size:12px;transition:opacity .2s}
+.report-submit:hover{opacity:.85}
+.report-msg{font-size:11px;margin-top:7px;min-height:16px;color:var(--gn);text-align:center;font-family:'Space Mono',monospace}
+.report-msg.err{color:var(--rd)}
+
+/* ── 프로필 모달 ── */
+.profile-ov{position:fixed;inset:0;z-index:360;background:#000a;display:flex;align-items:center;justify-content:center;animation:fu .2s ease}
+.profile-box{background:var(--pn);border:1px solid var(--bd);border-radius:12px;width:min(300px,90vw);padding:24px 22px;position:relative}
+.profile-avatar{width:56px;height:56px;border-radius:50%;background:var(--p2);border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}
+.profile-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px}
+.profile-id{font-size:11px;font-family:'Space Mono',monospace;color:var(--mu);text-align:center;margin-bottom:8px}
+.profile-status{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;color:var(--mu);font-family:'Space Mono',monospace;margin-bottom:14px}
+.profile-stat{background:var(--p2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;text-align:center}
+.profile-stat-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--ac)}
+.profile-stat-label{font-size:9px;color:var(--mu);font-family:'Space Mono',monospace;margin-top:2px}
+.profile-chat-btn{width:100%;margin-top:12px;padding:9px;background:transparent;border:1px solid var(--ac);color:var(--ac);border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s}
+.profile-chat-btn:hover{background:color-mix(in srgb,var(--ac) 12%,transparent)}
 
 /* ── 채팅 ── */
 .chat-ov{position:fixed;inset:0;z-index:350;background:#000a;display:flex;align-items:flex-end;justify-content:center;animation:fu .2s ease}
@@ -502,6 +615,25 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
   </div>
 </div>
 
+<!-- ── 정지 화면 (로그인 페이지 위) ── -->
+<div id="bannedOv" style="display:none;position:fixed;inset:0;z-index:210;background:var(--bg);align-items:center;justify-content:center">
+  <div class="lb" style="max-height:90vh;overflow-y:auto">
+    <div id="bannedScreen">
+      <div class="banned-icon">🚫</div>
+      <div class="banned-badge">계정 정지됨</div>
+      <div class="banned-reason-box">
+        <div class="banned-reason-label">정지 사유</div>
+        <div class="banned-reason-text" id="bannedReasonText">-</div>
+      </div>
+      <div class="banned-msg-label">관리자에게 메시지 보내기</div>
+      <textarea class="banned-textarea" id="bannedMsgInput" placeholder="억울하거나 문의할 내용을 적어주세요..."></textarea>
+      <button class="banned-send" onclick="sendBanMessage()">전송하기</button>
+      <div class="banned-msg" id="bannedMsgResult"></div>
+      <button class="banned-back" onclick="hideBannedScreen()">← 로그인 화면으로 돌아가기</button>
+    </div>
+  </div>
+</div>
+
 <div class="ann" id="ann"></div>
 <div id="toastWrap"></div>
 
@@ -627,13 +759,74 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
   </div>
 </div>
 
+<!-- ── 관리자 채팅 인박스 ── -->
+<div class="inbox-ov" id="inboxOv" style="display:none" onclick="if(event.target===this)closeInbox()">
+  <div class="inbox-box">
+    <div class="inbox-hdr">
+      <div class="inbox-hdr-title">💬 채팅 수신함</div>
+      <button class="chat-close" onclick="closeInbox()">✕</button>
+    </div>
+    <div class="inbox-list" id="inboxList">
+      <div class="inbox-empty">채팅 기록이 없습니다</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── 신고 모달 ── -->
+<div class="report-ov" id="reportOv" style="display:none" onclick="if(event.target===this)closeReport()">
+  <div class="report-box">
+    <button class="modal-close" onclick="closeReport()">✕</button>
+    <div class="report-title">🚨 신고하기</div>
+    <div class="report-target" id="reportTargetLabel">-</div>
+    <div class="report-label">신고 사유 선택</div>
+    <div class="report-options" id="reportOptions">
+      <label class="report-option" onclick="selectReportReason(this,'욕설')">
+        <input type="radio" name="reportReason" value="욕설"/>
+        <span>🤬 욕설 / 혐오 발언</span>
+      </label>
+      <label class="report-option" onclick="selectReportReason(this,'부정행위')">
+        <input type="radio" name="reportReason" value="부정행위"/>
+        <span>🎭 부정행위 / 치팅</span>
+      </label>
+      <label class="report-option" onclick="selectReportReason(this,'기타')">
+        <input type="radio" name="reportReason" value="기타"/>
+        <span>📝 기타</span>
+      </label>
+    </div>
+    <textarea class="report-custom" id="reportCustom" placeholder="신고 사유를 직접 입력해주세요..." maxlength="200" rows="3"></textarea>
+    <button class="report-submit" onclick="submitReport()">신고 제출하기</button>
+    <div class="report-msg" id="reportMsg"></div>
+  </div>
+</div>
+
+<!-- ── 프로필 모달 ── -->
+<div class="profile-ov" id="profileOv" style="display:none" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-box">
+    <button class="modal-close" onclick="closeProfile()">✕</button>
+    <div class="profile-avatar">👤</div>
+    <div class="profile-name" id="profileName">-</div>
+    <div class="profile-id" id="profileIdRow" style="display:none">ID: <span id="profileId">-</span></div>
+    <div class="profile-status" id="profileStatus">
+      <span class="rank-online-dot off" id="profileOnlineDot"></span>
+      <span id="profileOnlineLabel">오프라인</span>
+    </div>
+    <div class="profile-stat">
+      <div class="profile-stat-val" id="profileTotal">-</div>
+      <div class="profile-stat-label">총 자산 (KRW 환산)</div>
+    </div>
+    <button class="profile-chat-btn" id="profileChatBtn" style="display:none" onclick="profileStartChat()">💬 채팅하기</button>
+    <button class="profile-chat-btn" id="profileReportBtn" style="display:none;margin-top:7px;border-color:var(--rd);color:var(--rd)" onclick="profileStartReport()">🚨 신고하기</button>
+  </div>
+</div>
+
 <!-- ── 채팅 모달 ── -->
 <div class="chat-ov" id="chatOv" style="display:none" onclick="if(event.target===this)closeChat()">
   <div class="chat-box">
     <div class="chat-hdr">
-      <div>
+      <div style="cursor:pointer" onclick="openProfile(chatTarget,chatTargetDisplayName)" title="프로필 보기">
         <div class="chat-hdr-name" id="chatTargetName">-</div>
-        <div class="chat-hdr-sub">관리자 1:1 채팅</div>
+        <div class="chat-hdr-sub">1:1 채팅 · 클릭하여 프로필 보기</div>
       </div>
       <button class="chat-close" onclick="closeChat()">✕</button>
     </div>
@@ -734,7 +927,7 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
       <div class="wdot" id="wdot" title="서버 연결 상태"></div>
       <button class="bsm bsa" id="admBtn" style="display:none" onclick="openAdm()">⚙ 관리자</button>
       <span class="uname-chip" id="unameChip">-</span>
-      <button class="bsm" id="chatTopBtn" style="display:none;position:relative" onclick="openMemberChat()" title="관리자 채팅">💬<span id="chatTopDot" style="display:none;position:absolute;top:1px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--rd)"></span></button>
+      <button class="bsm" id="chatTopBtn" style="display:none;position:relative" onclick="onChatTopBtnClick()" title="채팅">💬<span id="chatTopDot" style="display:none;position:absolute;top:1px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--rd)"></span></button>
       <button class="bsm gear" onclick="openSettings()" title="개인 설정">⚙</button>
       <button class="bsm" onclick="doLogout()">로그아웃</button>
     </div>
@@ -754,6 +947,7 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
         <button class="mt" onclick="mTab('rank',this)">🏆 랭킹</button>
         <button class="mt" onclick="mTab('notice',this)">📌 공지</button>
         <button class="mt" onclick="openGuide()" style="border-color:#a855f7;color:#a855f7">📖 설명서</button>
+        <button class="mt" onclick="mTab('board',this)" style="border-color:#38bdf8;color:#38bdf8">💬 자유 게시판</button>
       </div>
 
       <!-- 차트 -->
@@ -876,6 +1070,34 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
             <div class="tab-box-title">📌 공지사항</div>
           </div>
           <div id="noticeList"><div style="color:var(--mu);text-align:center;padding:20px;font-size:12px">공지사항이 없습니다.</div></div>
+        </div>
+      </div>
+
+      <!-- 자유 게시판 -->
+      <div id="tBoard" style="display:none">
+        <div class="board-wrap">
+          <!-- 글쓰기 폼 -->
+          <div class="board-form">
+            <div class="board-form-title">✏️ 새 게시글</div>
+            <textarea class="board-textarea" id="boardText" placeholder="자유롭게 글을 써보세요... (URL은 자동으로 링크됩니다)" maxlength="1000"></textarea>
+            <div class="board-form-row">
+              <label class="board-img-label" for="boardImgInput">🖼 사진 첨부</label>
+              <input type="file" id="boardImgInput" accept="image/*" style="display:none" onchange="onBoardImgSelect(this)"/>
+              <img id="boardImgPreview" class="board-img-preview" alt="미리보기"/>
+              <button class="board-img-clear" id="boardImgClear" onclick="clearBoardImg()" title="사진 제거">✕</button>
+              <button class="board-submit" onclick="submitBoardPost()">게시하기</button>
+            </div>
+          </div>
+          <!-- 게시글 목록 -->
+          <div class="tab-box" style="padding:12px 14px">
+            <div class="tab-box-hdr" style="margin-bottom:10px">
+              <div class="tab-box-title">💬 자유 게시판</div>
+              <div class="board-count" id="boardCount"></div>
+            </div>
+            <div class="board-list" id="boardPosts">
+              <div class="board-empty">게시글이 없습니다. 첫 글을 남겨보세요!</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1021,6 +1243,28 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
       </div>
     </div>
 
+    <div class="asec">
+      <h3>✉️ 정지 계정 문의 메시지</h3>
+      <div style="overflow-x:auto">
+        <table class="ut" id="banMsgTable">
+          <thead><tr><th>아이디</th><th>이름</th><th>정지 사유</th><th>메시지</th><th>시간</th><th>상태</th><th>관리</th></tr></thead>
+          <tbody id="banMsgTbody"></tbody>
+        </table>
+      </div>
+      <div class="am" id="aBanMsgM" style="margin-top:6px"></div>
+    </div>
+
+    <div class="asec">
+      <h3>🚨 신고 접수 목록</h3>
+      <div style="overflow-x:auto">
+        <table class="ut" id="reportTable">
+          <thead><tr><th>신고자</th><th>신고 대상</th><th>대상 ID</th><th>사유</th><th>시간</th><th>상태</th><th>관리</th></tr></thead>
+          <tbody id="reportTbody"></tbody>
+        </table>
+      </div>
+      <div class="am" id="aRepM" style="margin-top:6px"></div>
+    </div>
+
     <div style="text-align:right;margin-top:12px">
       <button class="bc" onclick="closeAdm()">닫기</button>
     </div>
@@ -1077,10 +1321,44 @@ function stab(t){
   }
 })();
 
+let _bannedUsername='';
 async function doLogin(){
   const r=await POST(`${API}/login`,{username:g('lu').value.trim(),password:g('lpw').value});
-  if(!r||r.error){lmsg(r?.error||'서버 연결 실패');return;}
+  if(!r){lmsg('서버 연결 실패');return;}
+  // 정지 계정 처리
+  if(r.banned){
+    _bannedUsername=g('lu').value.trim();
+    showBannedScreen(r.bannedReason||'관리자에 의해 정지됨');
+    return;
+  }
+  if(r.error){lmsg(r.error);return;}
   token=r.token; localStorage.setItem('ccx_t',token); me=r.user; initApp();
+}
+function showBannedScreen(reason){
+  g('bannedReasonText').textContent=reason;
+  g('bannedMsgInput').value='';
+  g('bannedMsgResult').textContent='';
+  g('bannedMsgResult').className='banned-msg';
+  const ov=g('bannedOv');
+  ov.style.display='flex';
+}
+function hideBannedScreen(){
+  g('bannedOv').style.display='none';
+  _bannedUsername='';
+}
+async function sendBanMessage(){
+  const text=(g('bannedMsgInput')?.value||'').trim();
+  if(!text){
+    g('bannedMsgResult').textContent='메시지를 입력해주세요.';
+    g('bannedMsgResult').className='banned-msg err';
+    return;
+  }
+  const r=await POST(`${API}/ban-message`,{username:_bannedUsername,text});
+  const el=g('bannedMsgResult');
+  if(r?.error){el.textContent=r.error;el.className='banned-msg err';return;}
+  el.textContent='✅ 메시지가 관리자에게 전달되었습니다.';
+  el.className='banned-msg';
+  g('bannedMsgInput').value='';
 }
 async function doReg(){
   const r=await POST(`${API}/register`,{username:g('ru').value.trim(),password:g('rpw').value,displayName:g('rdn').value.trim()});
@@ -1114,10 +1392,14 @@ async function initApp(){
   selSym='UPC'; updTicker(); updCH();
   g('unameChip').textContent=(me.displayName||me.username)+(me.isAdmin?' 👑':'');
   if(me.isAdmin) g('admBtn').style.display='';
-  // 일반 회원은 채팅 버튼 표시
-  if(!me.isAdmin){
-    const cb=g('chatTopBtn');if(cb)cb.style.display='';
-    const mb=g('mnbChat');if(mb)mb.style.display='';
+  // 채팅 버튼: 관리자·멤버 모두 표시 (관리자는 인박스, 멤버는 직접 채팅)
+  const cb=g('chatTopBtn');if(cb){cb.style.display='';cb.title=me.isAdmin?'채팅 수신함':'관리자 채팅';}
+  if(!me.isAdmin){const mb=g('mnbChat');if(mb)mb.style.display='';}
+  // 관리자: 서버에서 미읽음 목록 초기화
+  if(me.isAdmin){
+    GET(`${API}/admin/chats/unread`).then(d=>{
+      if(d?.unread){d.unread.forEach(u=>ADMIN_UNREAD_LOCAL.add(u));updateAdminChatDot();}
+    });
   }
   if(Array.isArray(nR)) nR.slice().reverse().forEach(b=>prepBatch(b));
   document.querySelectorAll('.ar').forEach(r=>r.classList.remove('sel'));
@@ -1736,6 +2018,25 @@ function connectWS(){
       if(m.type==='NOTICE_NEW'){ prependNotice(m.data); return; }
       if(m.type==='NOTICE_DEL'){ removeNoticeEl(m.data?.id); return; }
       if(m.type==='CHAT'){ onChatMessage(m.data); return; }
+      if(m.type==='BOARD_NEW'){
+        const panel=g('tBoard');
+        if(panel&&panel.style.display!=='none'){
+          appendBoardPost(m.data,true);
+          const posts=g('boardPosts');
+          const count=posts?posts.querySelectorAll('[data-bid]').length:0;
+          updateBoardCount(count);
+        }
+        return;
+      }
+      if(m.type==='BOARD_DEL'){
+        const el=document.querySelector(`[data-bid="${m.data?.id}"]`);
+        if(el)el.remove();
+        const posts=g('boardPosts');
+        if(posts&&!posts.querySelector('[data-bid]'))posts.innerHTML='<div class="board-empty">게시글이 없습니다.</div>';
+        const count=posts?posts.querySelectorAll('[data-bid]').length:0;
+        updateBoardCount(count);
+        return;
+      }
       if(m.type==='BANNED'){ alert('⛔ 계정이 정지되었습니다.\n사유: '+(m.data?.reason||'관리자에 의해 정지됨')+'\n\n자동으로 로그아웃됩니다.'); doLogout(); return; }
     }catch(err){}
   };
@@ -2232,10 +2533,10 @@ function switchMobFeed(mode){
 
 /* ── 탭 전환 ── */
 function mTab(t,btn){
-  ['Chart','Trade','Bal','Tx','Rank','Notice','News'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'block':'none';});
+  ['Chart','Trade','Bal','Tx','Rank','Notice','News','Board'].forEach(x=>{const el=g('t'+x);if(el)el.style.display=x.toLowerCase()===t?'block':'none';});
   document.querySelectorAll('.mts .mt').forEach(b=>b.classList.remove('on'));
   if(btn)btn.classList.add('on');
-  else{ const map={chart:0,trade:1,bal:2,tx:3,rank:4,notice:5};const idx=map[t];const btns=document.querySelectorAll('.mts .mt');if(btns[idx])btns[idx].classList.add('on'); }
+  else{ const map={chart:0,trade:1,bal:2,tx:3,rank:4,notice:5,board:6};const idx=map[t];const btns=document.querySelectorAll('.mts .mt');if(idx!==undefined&&btns[idx])btns[idx].classList.add('on'); }
   // 모바일 네비 활성화
   ['mnbChart','mnbTrade','mnbBal','mnbNews','mnbChat'].forEach(id=>{const b=g(id);if(b)b.classList.remove('act');});
   if(t==='chart'&&g('mnbChart'))g('mnbChart').classList.add('act');
@@ -2258,6 +2559,7 @@ function mTab(t,btn){
   if(t==='tx')loadTx();
   if(t==='rank')loadRanking();
   if(t==='notice')loadNotices();
+  if(t==='board')loadBoardPosts();
 }
 
 /* ── 모바일 드로어/패널 ── */
@@ -2318,10 +2620,11 @@ async function loadRanking(){
   el.innerHTML=d.map((u,i)=>{
     const isMe=u.username===myU,barPct=Math.max(2,Math.round(u.total/top*100));
     const chatBtn=(isAdmin&&!u.isAdmin)?`<button class="rank-chat-btn" onclick="openChat('${u.username.replace(/'/g,"\\'")}','${(u.displayName||u.username).replace(/'/g,"\\'")}')">💬 채팅</button>`:'';
+    const profileClick=`openProfile('${u.username.replace(/'/g,"\\'")}','${(u.displayName||u.username).replace(/'/g,"\\'")}')`;
     return `<div class="rank-row${isMe?' me':''}">
       <div class="rank-num ${nCls[i]||'nn'}">${i+1}</div>
       <div class="rank-medal">${medals[i]||''}</div>
-      <div class="rank-info">
+      <div class="rank-info" style="cursor:pointer" onclick="${profileClick}">
         <div class="rank-name" style="display:flex;align-items:center;gap:0">${u.displayName||u.username}${u.isAdmin?' 👑':''}${isMe?'<span class="rank-me-tag">나</span>':''}<span class="rank-online-dot ${u.online?'on':'off'}" title="${u.online?'온라인':'오프라인'}"></span></div>
         <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barPct}%"></div></div>
       </div>
@@ -2396,6 +2699,249 @@ function prepFeed(tx){
 }
 function showAnn(m){if(!m)return;const e=g('ann');e.textContent='📢 '+m;e.classList.add('sh');setTimeout(()=>e.classList.remove('sh'),7000);}
 
+/* ── 관리자 채팅 인박스 ── */
+function onChatTopBtnClick(){
+  if(me?.isAdmin) openInbox();
+  else openMemberChat();
+}
+async function openInbox(){
+  g('inboxOv').style.display='flex';
+  await loadInbox();
+}
+function closeInbox(){ g('inboxOv').style.display='none'; }
+async function loadInbox(){
+  const list=g('inboxList');
+  list.innerHTML='<div class="inbox-empty">불러오는 중...</div>';
+  const d=await GET(`${API}/admin/chats`);
+  if(!d||!Array.isArray(d)||!d.length){list.innerHTML='<div class="inbox-empty">채팅 기록이 없습니다</div>';return;}
+  list.innerHTML='';
+  d.forEach(room=>{
+    const div=document.createElement('div');
+    div.className='inbox-row'+(room.unread?' unread':'');
+    const t=room.lastMsg?new Date(room.lastMsg.ts).toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'}):'';
+    const preview=room.lastMsg?(room.lastMsg.from==='admin'?'나: ':'')+room.lastMsg.text.slice(0,40):'메시지 없음';
+    div.innerHTML=`
+      <div class="inbox-avatar">👤<span class="online-ring ${room.online?'on':'off'}"></span></div>
+      <div class="inbox-info">
+        <div class="inbox-name">${room.displayName}${room.unread?'<span style="width:7px;height:7px;border-radius:50%;background:var(--rd);display:inline-block;flex-shrink:0"></span>':''}</div>
+        <div class="inbox-preview">${preview.replace(/</g,'&lt;')}</div>
+      </div>
+      <div class="inbox-meta">
+        <div class="inbox-time">${t}</div>
+        ${room.unread?'<div class="inbox-badge">NEW</div>':''}
+      </div>`;
+    div.addEventListener('click',async()=>{
+      closeInbox();
+      await POST(`${API}/admin/chats/${room.memberUsername}/read`,{});
+      ADMIN_UNREAD_LOCAL.delete(room.memberUsername);
+      updateAdminChatDot();
+      openChat(room.memberUsername, room.displayName);
+    });
+    list.appendChild(div);
+  });
+}
+
+const ADMIN_UNREAD_LOCAL = new Set(); // 클라이언트 미읽음 추적
+function updateAdminChatDot(){
+  const dot=g('chatTopDot');
+  if(dot) dot.style.display=ADMIN_UNREAD_LOCAL.size>0?'block':'none';
+}
+
+/* ── 자유 게시판 ── */
+let boardImgData=null;
+
+function onBoardImgSelect(input){
+  const file=input.files[0];
+  if(!file)return;
+  // 파일 크기 체크 (450KB)
+  if(file.size>460000){
+    alert('사진이 너무 큽니다.\n450KB 이하 파일을 선택해주세요.');
+    input.value='';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    boardImgData=e.target.result;
+    const prev=g('boardImgPreview');
+    prev.src=boardImgData;
+    prev.style.display='inline-block';
+    const clr=g('boardImgClear');
+    if(clr)clr.style.display='inline';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearBoardImg(){
+  boardImgData=null;
+  const prev=g('boardImgPreview');if(prev){prev.src='';prev.style.display='none';}
+  const clr=g('boardImgClear');if(clr)clr.style.display='none';
+  const inp=g('boardImgInput');if(inp)inp.value='';
+}
+
+async function loadBoardPosts(){
+  const el=g('boardPosts');
+  if(!el)return;
+  el.innerHTML='<div class="board-empty">불러오는 중...</div>';
+  const d=await GET(`${API}/board`);
+  if(!d||!Array.isArray(d)||!d.length){
+    el.innerHTML='<div class="board-empty">아직 게시글이 없습니다. 첫 글을 남겨보세요!</div>';
+    updateBoardCount(0); return;
+  }
+  el.innerHTML='';
+  // 서버에서 이미 최신순으로 내려오므로 순서대로 추가
+  d.forEach(p=>appendBoardPost(p,false));
+  updateBoardCount(d.length);
+}
+
+function updateBoardCount(n){
+  const el=g('boardCount');
+  if(el) el.textContent=n>0?`총 ${n}개 (최대 100개)`:'';
+}
+
+function appendBoardPost(post,animate=true){
+  const el=g('boardPosts');if(!el)return;
+  if(el.querySelector(`[data-bid="${post.id}"]`))return;
+  const empty=el.querySelector('.board-empty');if(empty)empty.remove();
+  const div=document.createElement('div');
+  div.className='board-post';
+  if(animate)div.style.animation='fi .3s ease';
+  div.setAttribute('data-bid',post.id);
+  const t=new Date(post.ts).toLocaleString('ko',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const canDel=(me&&(me.isAdmin||me.username===post.username));
+  const imgHtml=post.imageData
+    ?`<img class="board-post-img" src="${post.imageData}" alt="이미지" onclick="zoomImg(this.src)">`
+    :'';
+  div.innerHTML=`
+    <div class="board-post-hdr">
+      <div class="board-post-name" style="cursor:pointer" onclick="openProfile('${post.username.replace(/'/g,"\\'")}','${(post.displayName||post.username).replace(/'/g,"\\'").replace(/</g,'&lt;')}')" title="프로필 보기">${(post.displayName||post.username).replace(/</g,'&lt;')}${post.isAdmin?' 👑':''}</div>
+      <div class="board-post-meta">
+        <div class="board-post-time">${t}</div>
+        ${canDel?`<button class="board-post-del" onclick="deleteBoardPost('${post.id}')" title="삭제">🗑</button>`:''}
+      </div>
+    </div>
+    ${post.text?`<div class="board-post-text">${linkify(post.text.replace(/</g,'&lt;').replace(/\n/g,'\n'))}</div>`:''}
+    ${imgHtml}`;
+  // 최신순: 항상 맨 앞에 삽입
+  el.insertBefore(div,el.firstChild);
+}
+
+async function submitBoardPost(){
+  const text=(g('boardText')?.value||'').trim();
+  if(!text&&!boardImgData){alert('글 내용 또는 사진을 입력하세요.');return;}
+  const btn=document.querySelector('.board-submit');
+  if(btn){btn.disabled=true;btn.textContent='게시 중...';}
+  const r=await POST(`${API}/board`,{text,imageData:boardImgData||null});
+  if(btn){btn.disabled=false;btn.textContent='게시하기';}
+  if(r?.error){alert(r.error);return;}
+  // 성공: 입력 초기화
+  if(g('boardText'))g('boardText').value='';
+  clearBoardImg();
+  // 실시간 WS로 반영되지만, WS 수신 안 됐을 경우 직접 추가
+  if(r?.post){
+    appendBoardPost(r.post,true);
+    const el=g('boardPosts');
+    const count=el?el.querySelectorAll('[data-bid]').length:0;
+    updateBoardCount(count);
+  }
+}
+
+async function deleteBoardPost(id){
+  if(!confirm('이 게시글을 삭제하시겠습니까?'))return;
+  const r=await DELETE(`${API}/board/${id}`);
+  if(r?.error){alert(r.error);return;}
+  const el=document.querySelector(`[data-bid="${id}"]`);if(el)el.remove();
+  const posts=g('boardPosts');
+  if(posts&&!posts.querySelector('[data-bid]'))
+    posts.innerHTML='<div class="board-empty">게시글이 없습니다.</div>';
+  const count=posts?posts.querySelectorAll('[data-bid]').length:0;
+  updateBoardCount(count);
+}
+
+function zoomImg(src){
+  const ov=document.createElement('div');
+  ov.className='img-zoom-ov';
+  ov.innerHTML=`<img src="${src}" alt="확대"/>`;
+  ov.addEventListener('click',()=>ov.remove());
+  document.body.appendChild(ov);
+}
+
+/* ── 신고 모달 ── */
+let reportTargetUsername='', reportTargetDisplayName='', selectedReportReason='';
+function openReport(username, displayName){
+  reportTargetUsername=username; reportTargetDisplayName=displayName||username;
+  g('reportTargetLabel').textContent='신고 대상: '+reportTargetDisplayName;
+  // 초기화
+  selectedReportReason='';
+  document.querySelectorAll('.report-option').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.report-option input').forEach(el=>el.checked=false);
+  const cust=g('reportCustom');cust.value='';cust.style.display='none';
+  g('reportMsg').textContent='';
+  g('reportOv').style.display='flex';
+}
+function closeReport(){ g('reportOv').style.display='none'; }
+function selectReportReason(el, reason){
+  selectedReportReason=reason;
+  document.querySelectorAll('.report-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  const cust=g('reportCustom');
+  cust.style.display=reason==='기타'?'block':'none';
+  if(reason==='기타')cust.focus();
+}
+async function submitReport(){
+  if(!selectedReportReason){g('reportMsg').textContent='신고 사유를 선택해주세요.';g('reportMsg').className='report-msg err';return;}
+  const customReason=selectedReportReason==='기타'?g('reportCustom').value.trim():'';
+  if(selectedReportReason==='기타'&&!customReason){g('reportMsg').textContent='기타 사유를 입력해주세요.';g('reportMsg').className='report-msg err';return;}
+  const r=await POST(`${API}/report`,{targetUsername:reportTargetUsername,reason:selectedReportReason,customReason});
+  const el=g('reportMsg');
+  if(r?.error){el.textContent=r.error;el.className='report-msg err';return;}
+  el.textContent='✅ 신고가 접수되었습니다.';el.className='report-msg';
+  setTimeout(()=>closeReport(),1800);
+}
+function profileStartReport(){
+  closeProfile();
+  openReport(profileTargetUsername, profileTargetDisplayName);
+}
+
+/* ── 프로필 모달 ── */
+let profileTargetUsername='', profileTargetDisplayName='';
+async function openProfile(username, displayName){
+  profileTargetUsername=username; profileTargetDisplayName=displayName||username;
+  g('profileName').textContent=displayName||username;
+  // 관리자에게만 아이디 표시
+  if(me?.isAdmin){
+    g('profileId').textContent=username;
+    g('profileIdRow').style.display='';
+  } else {
+    g('profileIdRow').style.display='none';
+  }
+  // 채팅 버튼: 관리자만, 자기 자신 제외
+  const chatBtn=g('profileChatBtn');
+  if(me?.isAdmin && username!==me.username) chatBtn.style.display='';
+  else chatBtn.style.display='none';
+  // 신고 버튼: 일반 회원만, 자기 자신 제외, 관리자 제외
+  const repBtn=g('profileReportBtn');
+  // 신고 대상이 관리자인지 확인
+  const d=await GET(`${API}/ranking`);
+  const user=d?.find(u=>u.username===username);
+  if(!me?.isAdmin && username!==me?.username && !user?.isAdmin) repBtn.style.display='';
+  else repBtn.style.display='none';
+  // 온라인 상태 + 자산
+  const dot=g('profileOnlineDot'),lbl=g('profileOnlineLabel'),tot=g('profileTotal');
+  if(user){
+    dot.className='rank-online-dot '+(user.online?'on':'off');
+    lbl.textContent=user.online?'온라인':'오프라인';
+    tot.textContent=fmtI(user.total)+'원';
+  } else {
+    dot.className='rank-online-dot off'; lbl.textContent='오프라인'; tot.textContent='-';
+  }
+  g('profileOv').style.display='flex';
+}
+function closeProfile(){ g('profileOv').style.display='none'; }
+function profileStartChat(){
+  closeProfile();
+  openChat(profileTargetUsername, profileTargetDisplayName);
+}
+
 /* ── 1:1 채팅 ── */
 let chatTarget='', chatTargetDisplayName='';
 function openChat(username, displayName){
@@ -2449,8 +2995,14 @@ function onChatMessage(data){
   }
   // 채팅창이 닫혀있거나 다른 대화 → 뱃지 + 토스트 알림
   if(data.msg.from!==myU){
-    const dot=g('chatDot');if(dot)dot.style.display='block';
-    const topDot=g('chatTopDot');if(topDot)topDot.style.display='block';
+    // 관리자: 미읽음 추적
+    if(me?.isAdmin){
+      ADMIN_UNREAD_LOCAL.add(data.msg.from);
+      updateAdminChatDot();
+    } else {
+      const dot=g('chatDot');if(dot)dot.style.display='block';
+      const topDot=g('chatTopDot');if(topDot)topDot.style.display='block';
+    }
     // 발신자 표시: 관리자면 멤버 이름, 멤버면 "관리자 👑"
     const senderLabel=data.msg.from==='admin'?'관리자 👑':data.msg.from;
     const preview=data.msg.text.length>40?data.msg.text.slice(0,40)+'…':data.msg.text;
@@ -2458,7 +3010,15 @@ function onChatMessage(data){
     if(toast){
       const fromUser=data.msg.from;
       const dispName=fromUser==='admin'?'관리자 👑':fromUser;
-      toast.addEventListener('click',()=>{ toast.remove(); openChat(fromUser,dispName); });
+      toast.addEventListener('click',()=>{
+        toast.remove();
+        if(me?.isAdmin){
+          ADMIN_UNREAD_LOCAL.delete(fromUser);
+          POST(`${API}/admin/chats/${fromUser}/read`,{});
+          updateAdminChatDot();
+        }
+        openChat(fromUser,dispName);
+      });
     }
   }
 }
@@ -2483,7 +3043,79 @@ function buildAdmSel(){
 }
 async function openAdm(){
   if(!me?.isAdmin){alert('관리자 권한이 없습니다!');return;}
-  g('adm').classList.add('op');await loadAdmU();loadRateGrid();
+  g('adm').classList.add('op');
+  await Promise.all([loadAdmU(), loadAdmReports(), loadBanMsgs()]);
+  loadRateGrid();
+}
+
+async function loadBanMsgs(){
+  const d=await GET(`${API}/admin/ban-messages`);
+  const tbody=g('banMsgTbody');if(!tbody)return;
+  if(!d||!Array.isArray(d)||!d.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:12px">문의 메시지가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=d.map(m=>{
+    const t=new Date(m.ts).toLocaleString('ko',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const status=m.checked
+      ?`<span style="color:var(--mu);font-size:10px">✅ 확인됨</span>`
+      :`<span style="color:var(--ac);font-size:10px;font-weight:700">🆕 신규</span>`;
+    return `<tr style="${m.checked?'opacity:.55':''}">
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mu)">${m.username}</td>
+      <td style="font-weight:700">${(m.displayName||m.username).replace(/</g,'&lt;')}</td>
+      <td style="font-size:10px;color:var(--rd)">${(m.bannedReason||'').replace(/</g,'&lt;')}</td>
+      <td style="font-size:11px;max-width:200px;word-break:break-all">${m.text.replace(/</g,'&lt;')}</td>
+      <td style="font-size:9px;color:var(--mu);font-family:'Space Mono',monospace;white-space:nowrap">${t}</td>
+      <td>${status}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        ${!m.checked?`<button class="sbtn" style="font-size:9px;padding:2px 7px" onclick="checkBanMsg('${m.id}')">확인</button>`:''}
+        <button class="sbtn danger" style="font-size:9px;padding:2px 7px" onclick="deleteBanMsg('${m.id}')">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+async function checkBanMsg(id){
+  await POST(`${API}/admin/ban-messages/${id}/check`,{});
+  await loadBanMsgs();
+}
+async function deleteBanMsg(id){
+  if(!confirm('이 메시지를 삭제하시겠습니까?'))return;
+  await DELETE(`${API}/admin/ban-messages/${id}`);
+  await loadBanMsgs();
+}
+
+async function loadAdmReports(){
+  const d=await GET(`${API}/admin/reports`);
+  const tbody=g('reportTbody');if(!tbody)return;
+  if(!d||!Array.isArray(d)||!d.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:12px">신고 내역이 없습니다.</td></tr>';return;}
+  tbody.innerHTML=d.map(r=>{
+    const t=new Date(r.ts).toLocaleString('ko',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const reason=r.reason==='기타'&&r.customReason?`기타: ${r.customReason}`:r.reason;
+    const status=r.checked
+      ?`<span style="color:var(--mu);font-size:10px">✅ 확인됨</span>`
+      :`<span style="color:var(--rd);font-size:10px;font-weight:700">🆕 신규</span>`;
+    return `<tr style="${r.checked?'opacity:.5':''}">
+      <td style="font-size:10px">${r.reporterDisplayName}</td>
+      <td style="font-weight:700;color:var(--rd)">${r.targetDisplayName}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--mu)">${r.targetUsername}</td>
+      <td style="font-size:11px">${reason.replace(/</g,'&lt;')}</td>
+      <td style="font-size:9px;color:var(--mu);font-family:'Space Mono',monospace">${t}</td>
+      <td>${status}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        ${!r.checked?`<button class="sbtn" style="font-size:9px;padding:2px 7px" onclick="checkReport('${r.id}')">확인</button>`:''}
+        <button class="sbtn danger" style="font-size:9px;padding:2px 7px" onclick="deleteReport('${r.id}')">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+async function checkReport(id){
+  await POST(`${API}/admin/reports/${id}/check`,{});
+  await loadAdmReports();
+}
+async function deleteReport(id){
+  if(!confirm('이 신고를 삭제하시겠습니까?'))return;
+  await DELETE(`${API}/admin/reports/${id}`);
+  await loadAdmReports();
 }
 function closeAdm(){ g('adm').classList.remove('op'); }
 

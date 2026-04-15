@@ -55,7 +55,14 @@ app.use(['/api/login','/api/register'], rateLimit({ windowMs:15*60*1000, max:20,
 app.use('/api/chat/', rateLimit({ windowMs:60*1000, max:30, standardHeaders:true, legacyHeaders:false,
   message:{error:'메시지 전송이 너무 많습니다.'} }));
 
-app.use(express.json({ limit: '50kb' }));
+app.use((req, res, next) => {
+  // 게시판 이미지 업로드는 더 큰 허용량 필요
+  if(req.path === '/api/board' && req.method === 'POST'){
+    express.json({ limit: '600kb' })(req, res, next);
+  } else {
+    express.json({ limit: '50kb' })(req, res, next);
+  }
+});
 app.use(express.static(PUB));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'ccx_session_secret_2025',
@@ -686,8 +693,24 @@ function broadcast(m){
 /* ═══════════════════════════════════════════════════════
    채팅 저장소 (관리자 ↔ 멤버 1:1)
 ═══════════════════════════════════════════════════════ */
-const WS_USERS = new Map(); // username → ws
-const CHATS    = new Map(); // roomKey  → [{id,from,text,ts}]
+const WS_USERS     = new Map(); // username → ws
+const CHATS        = new Map(); // roomKey  → [{id,from,text,ts}]
+const ADMIN_UNREAD = new Set(); // 관리자가 아직 안 읽은 멤버 username 목록
+
+/* ═══════════════════════════════════════════════════════
+   자유 게시판 저장소
+═══════════════════════════════════════════════════════ */
+const BOARD = []; // [{id, username, displayName, text, imageData, ts}]
+
+/* ═══════════════════════════════════════════════════════
+   정지자 → 관리자 메시지 저장소
+═══════════════════════════════════════════════════════ */
+const BAN_MSGS = []; // [{id, username, displayName, text, ts, checked}]
+
+/* ═══════════════════════════════════════════════════════
+   신고 저장소
+═══════════════════════════════════════════════════════ */
+const REPORTS = []; // [{id, reporterUsername, targetUsername, targetDisplayName, reason, customReason, ts, checked}]
 
 function chatRoomKey(a, b){
   // 항상 "admin:멤버username" 형태로 정규화
@@ -741,6 +764,8 @@ wss.on('connection',ws=>{
         const chatMsg = {id:uuid(), from:ws._username, text, ts:Date.now()};
         room.push(chatMsg);
         if(room.length > 100) room.shift();
+        // 멤버→관리자 메시지: 미읽음 표시
+        if(toUser.isAdmin) ADMIN_UNREAD.add(ws._username);
         // 두 당사자에게 전송
         const payload = {type:'CHAT', data:{room:roomKey, msg:chatMsg, to:toUsername}};
         sendToUser(ws._username, payload);
@@ -796,7 +821,7 @@ app.post('/api/login',(req,res)=>{
   if(!username||!password)return res.status(400).json({error:'아이디와 비밀번호를 입력하세요.'});
   const u=USERS.get(username);
   if(!u)return res.status(401).json({error:'존재하지 않는 아이디입니다.'});
-  if(u.banned)return res.status(403).json({error:'정지된 계정입니다. 관리자에게 문의하세요.'});
+  if(u.banned)return res.status(403).json({error:'정지된 계정입니다.', banned:true, bannedReason:u.bannedReason||'관리자에 의해 정지됨', displayName:u.displayName||u.username});
   if(!bcrypt.compareSync(password,u.pw))return res.status(401).json({error:'비밀번호가 올바르지 않습니다.'});
   const token=jwt.sign({id:u.id,username:u.username,isAdmin:u.isAdmin},SECRET,{expiresIn:'8h'});
   res.json({token,user:{username:u.username,isAdmin:u.isAdmin,bal:u.bal}});
@@ -1111,10 +1136,198 @@ app.post('/api/chat/:username', auth, (req,res)=>{
   const chatMsg = {id:uuid(), from:req.user.username, text, ts:Date.now()};
   room.push(chatMsg);
   if(room.length > 100) room.shift();
+  // 멤버→관리자 메시지: 미읽음 표시
+  const targetUser2 = USERS.get(target);
+  if(targetUser2?.isAdmin) ADMIN_UNREAD.add(req.user.username);
   const payload = {type:'CHAT', data:{room:roomKey, msg:chatMsg, to:target}};
   sendToUser(req.user.username, payload);
   sendToUser(target, payload);
   res.json(chatMsg);
+});
+
+/* ── 관리자 채팅 인박스: 전체 대화방 목록 ── */
+app.get('/api/admin/chats', adm, (req, res) => {
+  const rooms = [];
+  for(const [key, msgs] of CHATS.entries()){
+    const memberUsername = key.split(':')[1];
+    const user = USERS.get(memberUsername);
+    if(!user) continue;
+    const lastMsg = msgs.length ? msgs[msgs.length-1] : null;
+    rooms.push({
+      memberUsername,
+      displayName: user.displayName || memberUsername,
+      online: WS_USERS.has(memberUsername),
+      unread: ADMIN_UNREAD.has(memberUsername),
+      lastMsg: lastMsg ? {text: lastMsg.text, from: lastMsg.from, ts: lastMsg.ts} : null,
+      msgCount: msgs.length,
+    });
+  }
+  rooms.sort((a,b)=>(b.lastMsg?.ts||0)-(a.lastMsg?.ts||0));
+  res.json(rooms);
+});
+
+/* ── 채팅방 읽음 처리 (관리자) ── */
+app.post('/api/admin/chats/:member/read', adm, (req, res) => {
+  ADMIN_UNREAD.delete(req.params.member);
+  res.json({ok:true, unreadCount: ADMIN_UNREAD.size});
+});
+
+/* ── 미읽음 수 조회 (관리자) ── */
+app.get('/api/admin/chats/unread', adm, (req, res) => {
+  res.json({unread:[...ADMIN_UNREAD], count: ADMIN_UNREAD.size});
+});
+
+/* ═══════════════════════════════════════════════════════
+   자유 게시판 API
+═══════════════════════════════════════════════════════ */
+
+/* 게시글 목록 (최신순) */
+app.get('/api/board', auth, (req, res) => {
+  res.json(BOARD.slice(0, 100));
+});
+
+/* 게시글 작성 */
+app.post('/api/board', auth, (req, res) => {
+  const u = USERS.get(req.user.username);
+  if(!u) return res.status(404).json({error:'유저 없음'});
+  const {text, imageData} = req.body;
+  const trimmed = (text||'').trim().slice(0, 1000);
+  if(!trimmed && !imageData) return res.status(400).json({error:'내용 또는 사진을 입력하세요.'});
+  // 이미지 크기 제한 300KB(base64)
+  if(imageData && imageData.length > 400000) return res.status(400).json({error:'사진이 너무 큽니다. (최대 300KB)'});
+  const post = {
+    id: uuid(),
+    username: u.username,
+    displayName: u.displayName || u.username,
+    isAdmin: u.isAdmin,
+    text: trimmed,
+    imageData: imageData || null,
+    ts: Date.now(),
+  };
+  BOARD.unshift(post);
+  if(BOARD.length > 100) BOARD.pop(); // 100개 초과 시 가장 오래된 글(마지막) 삭제
+  broadcast({type:'BOARD_NEW', data: post});
+  res.json({message:'게시 완료', post});
+});
+
+/* 게시글 삭제 (본인 또는 관리자) */
+app.delete('/api/board/:id', auth, (req, res) => {
+  const idx = BOARD.findIndex(p => p.id === req.params.id);
+  if(idx < 0) return res.status(404).json({error:'게시글 없음'});
+  const post = BOARD[idx];
+  const me = USERS.get(req.user.username);
+  if(!me?.isAdmin && post.username !== req.user.username)
+    return res.status(403).json({error:'삭제 권한 없음'});
+  BOARD.splice(idx, 1);
+  broadcast({type:'BOARD_DEL', data:{id: req.params.id}});
+  res.json({message:'삭제 완료'});
+});
+
+/* ═══════════════════════════════════════════════════════
+   정지자 메시지 API
+═══════════════════════════════════════════════════════ */
+
+/* 정지된 사람이 관리자에게 메시지 전송 (토큰 불필요 — 정지자는 로그인 불가) */
+app.post('/api/ban-message', (req, res) => {
+  const {username, text} = req.body;
+  if(!username || !text) return res.status(400).json({error:'내용을 입력하세요.'});
+  const u = USERS.get(username);
+  if(!u) return res.status(404).json({error:'유저 없음'});
+  if(!u.banned) return res.status(400).json({error:'정지된 계정이 아닙니다.'});
+  const trimmed = (text||'').trim().slice(0, 500);
+  if(!trimmed) return res.status(400).json({error:'메시지를 입력하세요.'});
+  // 도배 방지: 10분에 3건
+  const recent = BAN_MSGS.filter(m => m.username===username && Date.now()-m.ts < 600000);
+  if(recent.length >= 3) return res.status(429).json({error:'메시지를 너무 많이 보냈습니다. 잠시 후 다시 시도하세요.'});
+  const msg = {
+    id: uuid(),
+    username,
+    displayName: u.displayName || username,
+    bannedReason: u.bannedReason || '',
+    text: trimmed,
+    ts: Date.now(),
+    checked: false,
+  };
+  BAN_MSGS.unshift(msg);
+  if(BAN_MSGS.length > 200) BAN_MSGS.pop();
+  res.json({message:'메시지가 전송되었습니다.'});
+});
+
+/* 정지자 메시지 목록 조회 (관리자) */
+app.get('/api/admin/ban-messages', adm, (req, res) => {
+  res.json(BAN_MSGS.slice(0, 100));
+});
+
+/* 정지자 메시지 확인 처리 (관리자) */
+app.post('/api/admin/ban-messages/:id/check', adm, (req, res) => {
+  const m = BAN_MSGS.find(m => m.id === req.params.id);
+  if(!m) return res.status(404).json({error:'메시지 없음'});
+  m.checked = true;
+  res.json({ok: true});
+});
+
+/* 정지자 메시지 삭제 (관리자) */
+app.delete('/api/admin/ban-messages/:id', adm, (req, res) => {
+  const idx = BAN_MSGS.findIndex(m => m.id === req.params.id);
+  if(idx < 0) return res.status(404).json({error:'메시지 없음'});
+  BAN_MSGS.splice(idx, 1);
+  res.json({ok: true});
+});
+
+/* ═══════════════════════════════════════════════════════
+   신고 API
+═══════════════════════════════════════════════════════ */
+
+/* 신고 제출 */
+app.post('/api/report', auth, (req, res) => {
+  const me = USERS.get(req.user.username);
+  if(!me) return res.status(404).json({error:'유저 없음'});
+  const {targetUsername, reason, customReason} = req.body;
+  const VALID_REASONS = ['욕설', '부정행위', '기타'];
+  if(!targetUsername) return res.status(400).json({error:'신고 대상 없음'});
+  if(!VALID_REASONS.includes(reason)) return res.status(400).json({error:'신고 사유가 올바르지 않습니다.'});
+  const target = USERS.get(targetUsername);
+  if(!target) return res.status(404).json({error:'신고 대상 유저 없음'});
+  if(target.isAdmin) return res.status(400).json({error:'관리자는 신고할 수 없습니다.'});
+  if(targetUsername === req.user.username) return res.status(400).json({error:'자기 자신은 신고할 수 없습니다.'});
+  // 같은 대상 중복 신고 방지 (1시간 이내)
+  const recent = REPORTS.find(r => r.reporterUsername===req.user.username && r.targetUsername===targetUsername && Date.now()-r.ts < 3600000);
+  if(recent) return res.status(400).json({error:'같은 사람을 1시간 내에 중복 신고할 수 없습니다.'});
+  const report = {
+    id: uuid(),
+    reporterUsername: req.user.username,
+    reporterDisplayName: me.displayName || me.username,
+    targetUsername,
+    targetDisplayName: target.displayName || targetUsername,
+    reason,
+    customReason: (reason==='기타' ? (customReason||'').trim().slice(0,200) : ''),
+    ts: Date.now(),
+    checked: false,
+  };
+  REPORTS.unshift(report);
+  if(REPORTS.length > 500) REPORTS.pop();
+  res.json({message:'신고가 접수되었습니다.'});
+});
+
+/* 신고 목록 조회 (관리자) */
+app.get('/api/admin/reports', adm, (req, res) => {
+  res.json(REPORTS.slice(0, 200));
+});
+
+/* 신고 확인 처리 (관리자) */
+app.post('/api/admin/reports/:id/check', adm, (req, res) => {
+  const r = REPORTS.find(r => r.id === req.params.id);
+  if(!r) return res.status(404).json({error:'신고 없음'});
+  r.checked = true;
+  res.json({message:'확인 처리 완료'});
+});
+
+/* 신고 삭제 (관리자) */
+app.delete('/api/admin/reports/:id', adm, (req, res) => {
+  const idx = REPORTS.findIndex(r => r.id === req.params.id);
+  if(idx < 0) return res.status(404).json({error:'신고 없음'});
+  REPORTS.splice(idx, 1);
+  res.json({message:'신고 삭제 완료'});
 });
 
 /* ═══════════════════════════════════════════════════════
