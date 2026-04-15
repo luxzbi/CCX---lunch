@@ -1223,6 +1223,22 @@ app.post('/api/board', auth, (req, res) => {
   res.json({message:'게시 완료', post});
 });
 
+/* 게시글 공감 (토글) */
+app.post('/api/board/:id/like', auth, (req, res) => {
+  const post = BOARD.find(p => p.id === req.params.id);
+  if(!post) return res.status(404).json({error:'게시글 없음'});
+  if(!post.likes) post.likes = [];
+  const idx = post.likes.indexOf(req.user.username);
+  if(idx >= 0){
+    post.likes.splice(idx, 1); // 공감 취소
+  } else {
+    post.likes.push(req.user.username); // 공감 추가
+  }
+  const liked = idx < 0; // 방금 공감 추가했으면 true
+  broadcast({type:'BOARD_LIKE', data:{id:post.id, count:post.likes.length, liked, username:req.user.username}});
+  res.json({liked, count:post.likes.length});
+});
+
 /* 게시글 삭제 (본인 또는 관리자) */
 app.delete('/api/board/:id', auth, (req, res) => {
   const idx = BOARD.findIndex(p => p.id === req.params.id);
