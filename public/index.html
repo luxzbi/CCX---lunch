@@ -903,7 +903,7 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
     <div class="asec">
       <h3>📊 기준금리 관리</h3>
       <div class="arow">
-        <div class="af"><label>시장 기준금리 (%)</label><input id="aMarketRate" type="number" step="0.1" min="0" max="50" placeholder="3.5"/></div>
+        <div class="af"><label>시장 기준금리 (%)</label><input id="aMarketRate" type="number" step="0.1" min="20" max="50" placeholder="20"/></div>
         <button class="ba" onclick="aSetMarketRate()">설정</button>
         <div class="am" id="aMRM" style="align-self:center"></div>
       </div>
@@ -2528,7 +2528,7 @@ async function aUnbanDirect(username){
 
 async function loadRateGrid(){
   const d=await GET(`${API}/rates`);if(!d)return;
-  if(g('aMarketRate'))g('aMarketRate').value=d.marketRate||3.5;
+  if(g('aMarketRate'))g('aMarketRate').value=d.marketRate||20;
   const grid=g('rateGrid');if(!grid)return;grid.innerHTML='';
   Object.entries(assets).forEach(([s,a])=>{
     const div=document.createElement('div');div.className='rate-row';

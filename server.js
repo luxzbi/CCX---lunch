@@ -575,7 +575,7 @@ function clampPrice(a, newPrice){
    - 금리가 높을수록 주가 하락 압력, 낮을수록 상승 여력
    - 기준금리는 전체 시장에, 종목금리는 개별 종목에 적용
 ═══════════════════════════════════════════════════════ */
-let MARKET_RATE = 3.5; // 기준금리 (%)
+let MARKET_RATE = 20; // 기준금리 (%)
 const ASSET_RATES = {}; // 종목별 추가 금리
 Object.keys(ASSETS).forEach(sym => { ASSET_RATES[sym] = 0; }); // 초기값 0%
 
@@ -860,7 +860,7 @@ app.get('/api/rates',(req,res)=>{
 app.post('/api/admin/setmarketrate',adm,(req,res)=>{
   const {rate}=req.body;
   const r=parseFloat(rate);
-  if(isNaN(r)||r<0||r>50)return res.status(400).json({error:'금리는 0~50% 사이로 입력하세요.'});
+  if(isNaN(r)||r<20||r>50)return res.status(400).json({error:'금리는 20~50% 사이로 입력하세요.'});
   const old=MARKET_RATE; MARKET_RATE=r;
   const msg=`📊 [기준금리 변경] 시장 기준금리: ${old}% → ${r}%`;
   broadcast({type:'ANNOUNCE',data:{message:msg,ts:Date.now()}});
