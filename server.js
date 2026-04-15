@@ -915,7 +915,7 @@ app.get('/api/ranking',(req,res)=>{
   for(const u of USERS.values()){
     let total=Math.round(u.bal.KRW||0);
     Object.entries(ASSETS).forEach(([sym,a])=>{const q=parseFloat(u.bal[sym]||0);if(q>0)total+=Math.round(q*a.price);});
-    list.push({username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,total});
+    list.push({username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,total,online:WS_USERS.has(u.username)});
   }
   list.sort((a,b)=>b.total-a.total);
   res.json(list);
