@@ -2822,8 +2822,8 @@ async function loadBoardPosts(){
     updateBoardCount(0); return;
   }
   el.innerHTML='';
-  // 서버가 최신순으로 내려오므로 순서대로 append (prepend=false)
-  d.forEach(p=>appendBoardPost(p, false, false));
+  // 서버가 최신순(d[0]=최신)으로 내려오므로 역순으로 순회하며 insertBefore(firstChild) 사용 → 최신글이 항상 맨 위
+  [...d].reverse().forEach(p=>appendBoardPost(p, false, true));
   updateBoardCount(d.length);
 }
 
