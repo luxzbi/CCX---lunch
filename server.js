@@ -703,9 +703,10 @@ function broadcast(m){
 /* ═══════════════════════════════════════════════════════
    채팅 저장소 (관리자 ↔ 멤버 1:1)
 ═══════════════════════════════════════════════════════ */
-const WS_USERS     = new Map(); // username → ws
-const CHATS        = new Map(); // roomKey  → [{id,from,text,ts}]
-const ADMIN_UNREAD = new Set(); // 관리자가 아직 안 읽은 멤버 username 목록
+const WS_USERS      = new Map(); // username → ws
+const CHATS         = new Map(); // roomKey  → [{id,from,text,ts}]
+const ADMIN_UNREAD  = new Set(); // 관리자가 아직 안 읽은 멤버 username 목록
+const MEMBER_UNREAD = new Set(); // 멤버가 아직 안 읽은 관리자→멤버 메시지
 
 /* ═══════════════════════════════════════════════════════
    자유 게시판 저장소
@@ -752,6 +753,11 @@ wss.on('connection',ws=>{
           const u = jwt.verify(msg.token, SECRET);
           ws._username = u.username;
           WS_USERS.set(u.username, ws);
+          // 멤버에게 미읽음 관리자 메시지 있으면 알림 전송
+          const authUser = USERS.get(u.username);
+          if(authUser && !authUser.isAdmin && MEMBER_UNREAD.has(u.username)){
+            ws.send(JSON.stringify({type:'MEMBER_CHAT_UNREAD'}));
+          }
         }catch{}
         return;
       }
@@ -774,8 +780,10 @@ wss.on('connection',ws=>{
         const chatMsg = {id:uuid(), from:ws._username, text, ts:Date.now()};
         room.push(chatMsg);
         if(room.length > 100) room.shift();
-        // 멤버→관리자 메시지: 미읽음 표시
+        // 멤버→관리자: 관리자 미읽음 표시
         if(toUser.isAdmin) ADMIN_UNREAD.add(ws._username);
+        // 관리자→멤버: 멤버 미읽음 표시
+        if(fromUser.isAdmin) MEMBER_UNREAD.add(toUsername);
         // 두 당사자에게 전송
         const payload = {type:'CHAT', data:{room:roomKey, msg:chatMsg, to:toUsername}};
         sendToUser(ws._username, payload);
@@ -820,6 +828,11 @@ app.post('/api/register',async(req,res)=>{
   if(USERS.has(username))return res.status(400).json({error:'이미 사용 중인 아이디입니다.'});
   const isAdmin=(username==='admin');
   const dn=(displayName||'').trim()||username;
+  // 닉네임 중복 체크
+  const dnLower=dn.toLowerCase();
+  if([...USERS.values()].some(u=>u.displayName?.toLowerCase()===dnLower)){
+    return res.status(400).json({error:'이미 사용 중인 닉네임입니다. 다른 닉네임을 사용하세요.'});
+  }
   USERS.set(username,{id:uuid(),username,displayName:dn,pw:bcrypt.hashSync(password,10),isAdmin,bal:mkBal(isAdmin),createdAt:Date.now()});
   saveUsers();
   res.json({message:'가입 완료! 업핏코인 100개 + 다윗코인 100개 + 1,000,000원 지급!'});
@@ -851,8 +864,21 @@ app.post('/api/me/displayname',auth,(req,res)=>{
   const dn=(req.body.displayName||'').trim();
   if(!dn||dn.length<1)return res.status(400).json({error:'이름을 입력하세요.'});
   if(dn.length>20)return res.status(400).json({error:'이름은 20자 이내로 입력하세요.'});
+  // 닉네임 중복 체크 (본인 현재 닉네임은 허용)
+  const dnLower=dn.toLowerCase();
+  if(dnLower !== (u.displayName||'').toLowerCase()){
+    if([...USERS.values()].some(v=>v.username!==u.username && v.displayName?.toLowerCase()===dnLower)){
+      return res.status(400).json({error:'이미 사용 중인 닉네임입니다. 다른 닉네임을 사용하세요.'});
+    }
+  }
   u.displayName=dn; saveUsers();
   res.json({displayName:dn});
+});
+
+/* 멤버 채팅 미읽음 초기화 (관리자→멤버 메시지 읽음 처리) */
+app.post('/api/me/chat-read', auth, (req, res) => {
+  MEMBER_UNREAD.delete(req.user.username);
+  res.json({ok:true});
 });
 
 /* 비밀번호 변경 */
@@ -1357,6 +1383,20 @@ app.delete('/api/admin/reports/:id', adm, (req, res) => {
   if(idx < 0) return res.status(404).json({error:'신고 없음'});
   REPORTS.splice(idx, 1);
   res.json({message:'신고 삭제 완료'});
+});
+
+/* 회원 조회: 아이디→닉네임 / 닉네임→아이디 (관리자 전용) */
+app.get('/api/admin/lookup', adm, (req, res) => {
+  const q = (req.query.q || '').trim().toLowerCase();
+  if(!q) return res.status(400).json({error:'검색어를 입력하세요.'});
+  const results = [...USERS.values()]
+    .filter(u => !u.isAdmin && (
+      u.username.toLowerCase().includes(q) ||
+      (u.displayName||'').toLowerCase().includes(q)
+    ))
+    .map(u => ({username: u.username, displayName: u.displayName||u.username, banned: !!u.banned}))
+    .slice(0, 20);
+  res.json(results);
 });
 
 /* ═══════════════════════════════════════════════════════

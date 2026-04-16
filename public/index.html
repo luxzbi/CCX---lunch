@@ -523,6 +523,7 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
 .sbtn:hover{background:var(--ac);color:#000}
 .sbtn.danger{border-color:var(--rd);color:var(--rd)}
 .sbtn.danger:hover{background:var(--rd);color:#fff}
+.sbtn.on{background:var(--ac);color:var(--bg);font-weight:700}
 .smsg{font-size:11px;margin-top:6px;min-height:16px;color:var(--gn)}
 .smsg.err{color:var(--rd)}
 /* 토글 스위치 */
@@ -591,31 +592,39 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
 <!-- LOGIN -->
 <div id="lp">
   <div class="lb">
-    <div class="ll">COIN EXCHANGE v4.0</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="ll">COIN EXCHANGE v4.0</div>
+      <select id="loginLangSel" style="background:var(--p2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer" onchange="changeLang(this.value)">
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="en">🇺🇸 English</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="es">🇪🇸 Español</option>
+      </select>
+    </div>
     <div class="lt"><span class="c1">업핏</span>코인 &amp; <span class="c2">다윗</span>코인 가상 거래소</div>
     <div class="trow">
-      <button class="tb on" onclick="stab('login')">로그인</button>
-      <button class="tb" onclick="stab('reg')">회원가입</button>
+      <button class="tb on" data-i18n="login" onclick="stab('login')">로그인</button>
+      <button class="tb" data-i18n="signup" onclick="stab('reg')">회원가입</button>
     </div>
     <div id="lf">
-      <div class="fi"><label>아이디</label><input id="lu" placeholder="아이디"/></div>
-      <div class="fi"><label>비밀번호</label><input id="lpw" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-      <button class="bp" onclick="doLogin()">로그인</button>
-      <div class="bsep">또는</div>
+      <div class="fi"><label data-i18n="username">아이디</label><input id="lu" data-i18n-ph="username" placeholder="아이디"/></div>
+      <div class="fi"><label data-i18n="password">비밀번호</label><input id="lpw" type="password" data-i18n-ph="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="bp" data-i18n="login" onclick="doLogin()">로그인</button>
+      <div class="bsep" data-i18n="or">또는</div>
       <button class="bg" onclick="location.href='/api/auth/google'">
         <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.33 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.67 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-        Google 계정으로 로그인
+        <span data-i18n="google_login">Google 계정으로 로그인</span>
       </button>
     </div>
     <div id="rf" style="display:none">
-      <div class="fi"><label>이름 (표시될 이름)</label><input id="rdn" placeholder="예: 홍길동"/></div>
-      <div class="fi"><label>아이디</label><input id="ru" placeholder="사용할 아이디"/></div>
-      <div class="fi"><label>비밀번호</label><input id="rpw" type="password" placeholder="비밀번호"/></div>
-      <button class="bp" onclick="doReg()">가입하고 코인 받기 🎉</button>
-      <div class="bsep">또는</div>
+      <div class="fi"><label data-i18n="display_name">이름 (표시될 이름)</label><input id="rdn" data-i18n-ph="display_name_ph" placeholder="예: 홍길동"/></div>
+      <div class="fi"><label data-i18n="username">아이디</label><input id="ru" data-i18n-ph="username_ph" placeholder="사용할 아이디"/></div>
+      <div class="fi"><label data-i18n="password">비밀번호</label><input id="rpw" type="password" data-i18n-ph="password" placeholder="비밀번호"/></div>
+      <button class="bp" data-i18n="join_btn" onclick="doReg()">가입하고 코인 받기 🎉</button>
+      <div class="bsep" data-i18n="or">또는</div>
       <button class="bg" onclick="location.href='/api/auth/google'">
         <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.33 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.67 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
-        Google 계정으로 가입
+        <span data-i18n="google_signup">Google 계정으로 가입</span>
       </button>
     </div>
     <div class="lm" id="lmsg"></div>
@@ -744,6 +753,17 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
           체결 효과음
           <label class="tog"><input type="checkbox" id="sNotiSound" onchange="saveNotiPref()"/><span class="tog-sl"></span></label>
         </label>
+      </div>
+    </div>
+
+    <!-- 언어 설정 -->
+    <div class="srow" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <span class="srow-label" data-i18n="lang_label">언어 / Language</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="sbtn lang-btn" data-lang="ko" onclick="changeLang('ko')">🇰🇷 한국어</button>
+        <button class="sbtn lang-btn" data-lang="en" onclick="changeLang('en')">🇺🇸 English</button>
+        <button class="sbtn lang-btn" data-lang="ja" onclick="changeLang('ja')">🇯🇵 日本語</button>
+        <button class="sbtn lang-btn" data-lang="es" onclick="changeLang('es')">🇪🇸 Español</button>
       </div>
     </div>
 
@@ -1220,6 +1240,15 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
     </div>
 
     <div class="asec">
+      <h3>🔍 회원 조회 (아이디 ↔ 닉네임)</h3>
+      <div class="arow">
+        <div class="af" style="flex:2"><label>아이디 또는 닉네임 검색</label><input id="aLookupQ" placeholder="아이디 또는 닉네임 입력" onkeydown="if(event.key==='Enter')adminLookup()"/></div>
+        <button class="ba" onclick="adminLookup()">🔍 검색</button>
+      </div>
+      <div id="aLookupResult" style="margin-top:8px;font-size:12px"></div>
+    </div>
+
+    <div class="asec">
       <h3>👥 전체 회원 목록</h3>
       <div style="overflow-x:auto">
         <table class="ut">
@@ -1284,6 +1313,137 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
 </script>
 <script>
 'use strict';
+
+/* ════════════════════════════════════════════════
+   다국어 번역 테이블  (ko / en / ja / es)
+════════════════════════════════════════════════ */
+const TRANSLATIONS = {
+  ko: {
+    login:'로그인', signup:'회원가입', username:'아이디', password:'비밀번호',
+    display_name:'이름 (표시될 이름)', display_name_ph:'예: 홍길동',
+    username_ph:'사용할 아이디', join_btn:'가입하고 코인 받기 🎉',
+    or:'또는', google_login:'Google 계정으로 로그인', google_signup:'Google 계정으로 가입',
+    settings_title:'⚙ 개인 설정', settings_id:'아이디', settings_dn:'표시 이름',
+    settings_save:'저장', settings_pw:'비밀번호 변경', settings_cur_pw:'현재 비밀번호',
+    settings_new_pw:'새 비밀번호 (4자 이상)', settings_pw_btn:'변경',
+    settings_theme:'테마', settings_noti:'알림 & 효과음', lang_label:'언어',
+    tab_chart:'📈 차트', tab_trade:'💱 매수/매도', tab_bal:'💼 잔고',
+    tab_tx:'📋 거래내역', tab_rank:'🏆 랭킹', tab_notice:'📌 공지',
+    tab_board:'💬 자유 게시판', guide_btn:'📖 설명서',
+    buy:'매수', sell:'매도', trade_exec_buy:'▲ 매수 실행', trade_exec_sell:'▼ 매도 실행',
+    board_placeholder:'자유롭게 글을 작성하세요...', board_submit:'게시하기',
+    board_empty:'아직 게시글이 없습니다. 첫 글을 남겨보세요!',
+    chat_placeholder:'메시지를 입력하세요...', send:'전송',
+    new_msg:'새 채팅 메시지', admin_chat:'관리자 채팅',
+  },
+  en: {
+    login:'Login', signup:'Sign Up', username:'Username', password:'Password',
+    display_name:'Display Name', display_name_ph:'e.g. John',
+    username_ph:'Choose a username', join_btn:'Join & Get Coins 🎉',
+    or:'or', google_login:'Sign in with Google', google_signup:'Sign up with Google',
+    settings_title:'⚙ Settings', settings_id:'Username', settings_dn:'Display Name',
+    settings_save:'Save', settings_pw:'Change Password', settings_cur_pw:'Current Password',
+    settings_new_pw:'New Password (4+ chars)', settings_pw_btn:'Change',
+    settings_theme:'Theme', settings_noti:'Notifications & Sound', lang_label:'Language',
+    tab_chart:'📈 Chart', tab_trade:'💱 Trade', tab_bal:'💼 Balance',
+    tab_tx:'📋 History', tab_rank:'🏆 Ranking', tab_notice:'📌 Notices',
+    tab_board:'💬 Board', guide_btn:'📖 Guide',
+    buy:'Buy', sell:'Sell', trade_exec_buy:'▲ Buy', trade_exec_sell:'▼ Sell',
+    board_placeholder:'Write something...', board_submit:'Post',
+    board_empty:'No posts yet. Be the first!',
+    chat_placeholder:'Type a message...', send:'Send',
+    new_msg:'New Chat Message', admin_chat:'Admin Chat',
+  },
+  ja: {
+    login:'ログイン', signup:'新規登録', username:'ユーザーID', password:'パスワード',
+    display_name:'表示名', display_name_ph:'例: 山田太郎',
+    username_ph:'ユーザーIDを入力', join_btn:'登録してコインをもらう 🎉',
+    or:'または', google_login:'Googleでログイン', google_signup:'Googleで登録',
+    settings_title:'⚙ 設定', settings_id:'ユーザーID', settings_dn:'表示名',
+    settings_save:'保存', settings_pw:'パスワード変更', settings_cur_pw:'現在のパスワード',
+    settings_new_pw:'新しいパスワード（4文字以上）', settings_pw_btn:'変更',
+    settings_theme:'テーマ', settings_noti:'通知・効果音', lang_label:'言語',
+    tab_chart:'📈 チャート', tab_trade:'💱 売買', tab_bal:'💼 残高',
+    tab_tx:'📋 取引履歴', tab_rank:'🏆 ランキング', tab_notice:'📌 お知らせ',
+    tab_board:'💬 掲示板', guide_btn:'📖 説明書',
+    buy:'買い', sell:'売り', trade_exec_buy:'▲ 買い注文', trade_exec_sell:'▼ 売り注文',
+    board_placeholder:'自由に書いてください...', board_submit:'投稿',
+    board_empty:'まだ投稿がありません。最初の投稿をしてみましょう！',
+    chat_placeholder:'メッセージを入力...', send:'送信',
+    new_msg:'新しいチャット', admin_chat:'管理者チャット',
+  },
+  es: {
+    login:'Iniciar sesión', signup:'Registrarse', username:'Usuario', password:'Contraseña',
+    display_name:'Nombre a mostrar', display_name_ph:'Ej: Juan García',
+    username_ph:'Elige un usuario', join_btn:'Registrarse y recibir monedas 🎉',
+    or:'o', google_login:'Entrar con Google', google_signup:'Registrarse con Google',
+    settings_title:'⚙ Configuración', settings_id:'Usuario', settings_dn:'Nombre',
+    settings_save:'Guardar', settings_pw:'Cambiar contraseña', settings_cur_pw:'Contraseña actual',
+    settings_new_pw:'Nueva contraseña (4+ caracteres)', settings_pw_btn:'Cambiar',
+    settings_theme:'Tema', settings_noti:'Notificaciones y sonido', lang_label:'Idioma',
+    tab_chart:'📈 Gráfico', tab_trade:'💱 Operar', tab_bal:'💼 Saldo',
+    tab_tx:'📋 Historial', tab_rank:'🏆 Ranking', tab_notice:'📌 Avisos',
+    tab_board:'💬 Tablero', guide_btn:'📖 Guía',
+    buy:'Comprar', sell:'Vender', trade_exec_buy:'▲ Comprar', trade_exec_sell:'▼ Vender',
+    board_placeholder:'Escribe algo...', board_submit:'Publicar',
+    board_empty:'Aún no hay publicaciones. ¡Sé el primero!',
+    chat_placeholder:'Escribe un mensaje...', send:'Enviar',
+    new_msg:'Nuevo mensaje de chat', admin_chat:'Chat con Admin',
+  },
+};
+
+let _lang = localStorage.getItem('ccx_lang') || 'ko';
+
+function t(key){ return TRANSLATIONS[_lang]?.[key] || TRANSLATIONS.ko[key] || key; }
+
+function changeLang(lang){
+  _lang = lang;
+  localStorage.setItem('ccx_lang', lang);
+  applyLang();
+}
+
+function applyLang(){
+  const T = TRANSLATIONS[_lang] || TRANSLATIONS.ko;
+  // data-i18n 텍스트 치환
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(T[key] !== undefined) el.textContent = T[key];
+  });
+  // data-i18n-ph placeholder 치환
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-ph');
+    if(T[key] !== undefined) el.placeholder = T[key];
+  });
+  // 탭 버튼 텍스트 직접 업데이트
+  const tabMap = {
+    chart:'tab_chart', trade:'tab_trade', bal:'tab_bal',
+    tx:'tab_tx', rank:'tab_rank', notice:'tab_notice', board:'tab_board'
+  };
+  document.querySelectorAll('.mts .mt').forEach(btn=>{
+    const fn = btn.getAttribute('onclick')||'';
+    const m = fn.match(/mTab\('(\w+)'/);
+    if(m && tabMap[m[1]] && T[tabMap[m[1]]]) btn.textContent = T[tabMap[m[1]]];
+  });
+  // 로그인 셀렉트 동기화
+  const lsel = document.getElementById('loginLangSel');
+  if(lsel) lsel.value = _lang;
+  // 설정 언어 버튼 활성화 표시
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.classList.toggle('on', btn.getAttribute('data-lang')===_lang);
+  });
+  // 설정 모달 제목 / 섹션 라벨 업데이트
+  const setTitle = document.querySelector('#settingsOv .modal-title');
+  if(setTitle) setTitle.textContent = T.settings_title;
+  // 게시판 placeholder 업데이트
+  const btp = document.getElementById('boardText');
+  if(btp) btp.placeholder = T.board_placeholder;
+  const bsub = document.querySelector('.board-submit');
+  if(bsub) bsub.textContent = T.board_submit;
+  // 채팅 placeholder
+  const cin = document.getElementById('chatInput');
+  if(cin) cin.placeholder = T.chat_placeholder;
+}
+
 const API = '/api';
 const WSU = (location.protocol==='https:'?'wss://':'ws://')+location.host;
 let token=localStorage.getItem('ccx_t')||'', me=null, ws=null;
@@ -1427,6 +1587,7 @@ async function initApp(){
   // 테마는 페이지 로드 시 이미 적용됨 (별도 처리 불필요)
 }
 window.addEventListener('DOMContentLoaded',async()=>{
+  applyLang(); // 페이지 로드 시 언어 즉시 적용
   if(!token)return;
   const r=await GET(`${API}/me`);
   if(r&&!r.error){ me=r; initApp(); } else { localStorage.removeItem('ccx_t'); token=''; }
@@ -1469,6 +1630,7 @@ function openSettings(){
     const card=g('tc-'+t);
     if(card) card.classList.toggle('active',t===curTheme);
   });
+  applyLang(); // 설정 열릴 때 언어 재적용 (언어 버튼 활성 상태 등)
   g('settingsOv').style.display='flex';
 }
 function closeSettings(){ g('settingsOv').style.display='none'; }
@@ -2031,6 +2193,17 @@ function connectWS(){
       if(m.type==='NOTICE_NEW'){ prependNotice(m.data); return; }
       if(m.type==='NOTICE_DEL'){ removeNoticeEl(m.data?.id); return; }
       if(m.type==='CHAT'){ onChatMessage(m.data); return; }
+      if(m.type==='MEMBER_CHAT_UNREAD'){
+        // 관리자가 보낸 미읽음 메시지 있음 → 멤버에게 알림 점 표시
+        if(!me?.isAdmin){
+          const dot=g('chatDot'); if(dot)dot.style.display='block';
+          const topDot=g('chatTopDot'); if(topDot)topDot.style.display='block';
+          showToastClickable('chat','💬',t('new_msg'),t('admin_chat'),6000)?.addEventListener('click',()=>{
+            openMemberChat();
+          });
+        }
+        return;
+      }
       if(m.type==='BOARD_NEW'){
         const panel=g('tBoard');
         if(panel&&panel.style.display!=='none'){
@@ -3057,9 +3230,10 @@ function appendChatMsg(m){
 function openMemberChat(){
   if(me?.isAdmin) return; // 관리자는 이 경로 사용 안 함
   openChat('admin','관리자 👑');
-  // 뱃지 지우기
+  // 뱃지 지우기 + 서버 읽음 처리
   const dot=g('chatDot');if(dot)dot.style.display='none';
   const topDot=g('chatTopDot');if(topDot)topDot.style.display='none';
+  POST(`${API}/me/chat-read`,{}).catch(()=>{});
 }
 
 function onChatMessage(data){
@@ -3088,7 +3262,7 @@ function onChatMessage(data){
     // 발신자 표시: 관리자면 멤버 이름, 멤버면 "관리자 👑"
     const senderLabel=data.msg.from==='admin'?'관리자 👑':data.msg.from;
     const preview=data.msg.text.length>40?data.msg.text.slice(0,40)+'…':data.msg.text;
-    const toast=showToastClickable('chat','💬','새 채팅 메시지',`${senderLabel}: ${preview}`,6000);
+    const toast=showToastClickable('chat','💬',t('new_msg'),`${senderLabel}: ${preview}`,6000);
     if(toast){
       const fromUser=data.msg.from;
       const dispName=fromUser==='admin'?'관리자 👑':fromUser;
@@ -3118,6 +3292,19 @@ async function sendChat(){
 }
 
 /* ── 관리자 ── */
+async function adminLookup(){
+  const q=(g('aLookupQ')?.value||'').trim();
+  const res=g('aLookupResult'); if(!res)return;
+  if(!q){res.innerHTML='<span style="color:var(--mu)">검색어를 입력하세요.</span>';return;}
+  res.innerHTML='<span style="color:var(--mu)">검색 중...</span>';
+  const d=await GET(`${API}/admin/lookup?q=${encodeURIComponent(q)}`);
+  if(!d||d.error){res.innerHTML=`<span style="color:var(--rd)">${d?.error||'오류'}</span>`;return;}
+  if(!d.length){res.innerHTML='<span style="color:var(--mu)">검색 결과가 없습니다.</span>';return;}
+  res.innerHTML=`<table class="ut" style="min-width:280px"><thead><tr><th>아이디</th><th>닉네임</th><th>상태</th></tr></thead><tbody>${
+    d.map(u=>`<tr><td style="font-family:'Space Mono',monospace;font-size:10px">${escHtml(u.username)}</td><td style="font-weight:700">${escHtml(u.displayName)}</td><td style="font-size:10px;color:${u.banned?'var(--rd)':'var(--gn)'}">${u.banned?'🚫 정지':'✅ 정상'}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+
 function buildAdmSel(){
   const gs=g('aGS');gs.innerHTML='<option value="KRW">KRW (원화)</option>';
   const ps=g('aPS');ps.innerHTML='';
