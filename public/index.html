@@ -2544,18 +2544,17 @@ const NEWS_TRANSLATIONS_EN = {
 
 function translateHeadline(text){
   if(!text || _lang==='ko') return text || '';
-  if(_lang==='en'){
-    const direct=NEWS_TRANSLATIONS_EN[text];
-    if(direct) return direct;
-  }
-  let out = text;
+  // 영어는 직접 맵 사용
+  const enDirect = NEWS_TRANSLATIONS_EN[text];
+  if(_lang==='en') return enDirect || text;
+  // 일본어·스페인어: 영어 번역을 베이스로, 자산명·태그만 해당 언어로 치환
+  let out = enDirect || text;
   Object.entries(ASSET_NAMES).forEach(([sym,names])=>{
-    out = out.split(names.ko).join(names[_lang] || names.en || names.ko);
+    const base = enDirect ? (names.en || names.ko) : names.ko;
+    const target = names[_lang] || names.en || names.ko;
+    if(base !== target) out = out.split(base).join(target);
   });
   out = out.replace(/\[([^\]]+)\]/g, (_, tag) => `[${translateBracketTag(tag)}]`);
-  (NEWS_REPLACEMENTS[_lang] || []).forEach(([from,to])=>{
-    out = out.split(from).join(to);
-  });
   return out;
 }
 
