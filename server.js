@@ -3,8 +3,11 @@
  * 22개 자산 | 305개 가상 뉴스(4개씩 동시 발표) | 가변 임팩트
  * 매수(buy)=KRW지불→자산취득 / 매도(sell)=자산반납→KRW수령
  */
+// server.js 파일 최상단
+require('dotenv').config(); 
+// ... 나머지 코드
+
 'use strict';
-require('dotenv').config();
 const express        = require('express');
 const http           = require('http');
 const WebSocket      = require('ws');
@@ -543,7 +546,10 @@ function loadNotices(){
   try{
     if(fs.existsSync(NOTICE_FILE)){
       const data=JSON.parse(fs.readFileSync(NOTICE_FILE,'utf-8'));
-      NOTICES.push(...data);
+      const sorted = Array.isArray(data)
+        ? data.slice().sort((a,b)=>(b?.createdAt||0)-(a?.createdAt||0))
+        : [];
+      NOTICES.push(...sorted);
       console.log(`✅ 공지 ${data.length}개 로드`);
     }
   }catch(e){ console.error('공지 로드 실패:',e.message); }
@@ -823,7 +829,8 @@ function adm(req,res,next){ auth(req,res,()=>{ if(!req.user.isAdmin)return res.s
 app.post('/api/register',async(req,res)=>{
   const {username,password,displayName}=req.body;
   if(!username||!password)return res.status(400).json({error:'아이디와 비밀번호를 입력하세요.'});
-  if(username.length<2)return res.status(400).json({error:'아이디는 2자 이상이어야 합니다.'});
+  if(username.length<2||username.length>20)return res.status(400).json({error:'아이디는 2~20자여야 합니다.'});
+  if(!/^[a-zA-Z0-9_]+$/.test(username))return res.status(400).json({error:'아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.'});
   if(password.length<4)return res.status(400).json({error:'비밀번호는 4자 이상이어야 합니다.'});
   if(USERS.has(username))return res.status(400).json({error:'이미 사용 중인 아이디입니다.'});
   const isAdmin=(username==='admin');
@@ -949,7 +956,10 @@ app.post('/api/admin/setassetrate',adm,(req,res)=>{
 });
 
 /* ── 공지 목록 조회 ── */
-app.get('/api/notices',(req,res)=>res.json(NOTICES.slice(0,50)));
+app.get('/api/notices',(req,res)=>{
+  const sorted = NOTICES.slice().sort((a,b)=>(b?.createdAt||0)-(a?.createdAt||0));
+  res.json(sorted.slice(0,50));
+});
 
 /* ── 공지 등록 (관리자) ── */
 app.post('/api/admin/notice',adm,(req,res)=>{
@@ -976,10 +986,35 @@ app.get('/api/ranking',(req,res)=>{
   for(const u of USERS.values()){
     let total=Math.round(u.bal.KRW||0);
     Object.entries(ASSETS).forEach(([sym,a])=>{const q=parseFloat(u.bal[sym]||0);if(q>0)total+=Math.round(q*a.price);});
-    list.push({username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,total,online:WS_USERS.has(u.username)});
+    list.push({id:u.id,username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,total,online:WS_USERS.has(u.username)});
   }
   list.sort((a,b)=>b.total-a.total);
   res.json(list);
+});
+
+/* ── 자금 재충전 (파산 구제) ── */
+// 총자산이 REFILL_THRESHOLD 이하일 때 스스로 재충전 가능. 하루 1회
+const REFILL_THRESHOLD = 50_000;   // 총자산 5만원 이하
+const REFILL_AMOUNT    = 500_000;  // 재충전 금액 50만원
+const refillCooldown   = new Map(); // username -> last refill timestamp
+app.post('/api/refill',auth,(req,res)=>{
+  const u=USERS.get(req.user.username);
+  if(!u)return res.status(404).json({error:'유저 없음'});
+  // 총자산 계산
+  let total=Math.round(u.bal.KRW||0);
+  Object.entries(ASSETS).forEach(([sym,a])=>{const q=parseFloat(u.bal[sym]||0);if(q>0)total+=Math.round(q*a.price);});
+  if(total>REFILL_THRESHOLD)return res.status(400).json({error:`총자산이 ${REFILL_THRESHOLD.toLocaleString()}원 이하일 때만 재충전할 수 있습니다. (현재 ${total.toLocaleString()}원)`});
+  // 쿨다운 확인 (24시간)
+  const last=refillCooldown.get(u.username)||0;
+  const coolMs=24*60*60*1000;
+  if(Date.now()-last<coolMs){
+    const remaining=Math.ceil((coolMs-(Date.now()-last))/3600000);
+    return res.status(400).json({error:`재충전은 24시간에 1회만 가능합니다. (${remaining}시간 후 가능)`});
+  }
+  u.bal.KRW=Math.round((u.bal.KRW||0)+REFILL_AMOUNT);
+  refillCooldown.set(u.username,Date.now());
+  saveUsers();
+  res.json({message:`💰 ${REFILL_AMOUNT.toLocaleString()}원이 재충전되었습니다!`,bal:u.bal});
 });
 
 /* ── 전체 자금 초기화 (관리자) ── */
@@ -1044,7 +1079,7 @@ app.get('/api/transactions',auth,(req,res)=>{
 app.get('/api/admin/users',adm,(req,res)=>{
   const list=[];
   for(const u of USERS.values())
-    list.push({username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,banned:!!u.banned,bannedReason:u.bannedReason||'',bal:u.bal,createdAt:u.createdAt});
+    list.push({id:u.id,username:u.username,displayName:u.displayName||u.username,isAdmin:u.isAdmin,banned:!!u.banned,bannedReason:u.bannedReason||'',bal:u.bal,createdAt:u.createdAt});
   res.json(list);
 });
 
