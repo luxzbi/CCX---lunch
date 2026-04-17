@@ -1127,7 +1127,7 @@ body.cherry body::before{background-image:linear-gradient(var(--bd)1px,transpare
               <div class="board-count" id="boardCount"></div>
             </div>
             <div class="board-list" id="boardPosts">
-              <div class="board-empty">게시글이 없습니다. 첫 글을 남겨보세요!</div>
+              <div class="board-empty" id="boardEmptyMsg">게시글이 없습니다. 첫 글을 남겨보세요!</div>
             </div>
           </div>
         </div>
@@ -1445,6 +1445,11 @@ const TRANSLATIONS = {
     mob_stocks_drawer:'📊 종목 목록',
     mob_news_sheet:'📰 뉴스 피드',
     notice_panel_empty:'공지사항이 없습니다.',
+    trade_exec_title_buy:'매수 체결', trade_exec_title_sell:'매도 체결',
+    trade_exec_done_buy:'매수 완료!', trade_exec_done_sell:'매도 완료!',
+    trade_exec_desc:'{name}({sym}) {qty}주 체결',
+    trade_qty_err:'수량을 입력하세요.',
+    trade_server_err:'서버 오류',
   },
   en: {
     login:'Login', signup:'Sign Up', username:'Username', password:'Password',
@@ -1568,6 +1573,11 @@ const TRANSLATIONS = {
     mob_stocks_drawer:'📊 Asset List',
     mob_news_sheet:'📰 News Feed',
     notice_panel_empty:'No notices yet.',
+    trade_exec_title_buy:'Buy Executed', trade_exec_title_sell:'Sell Executed',
+    trade_exec_done_buy:'✅ Buy complete!', trade_exec_done_sell:'✅ Sell complete!',
+    trade_exec_desc:'{name}({sym}) {qty} units filled',
+    trade_qty_err:'Please enter a quantity.',
+    trade_server_err:'Server error',
   },
   ja: {
     login:'ログイン', signup:'新規登録', username:'ユーザーID', password:'パスワード',
@@ -1691,6 +1701,11 @@ const TRANSLATIONS = {
     mob_stocks_drawer:'📊 銘柄一覧',
     mob_news_sheet:'📰 ニュースフィード',
     notice_panel_empty:'お知らせはまだありません。',
+    trade_exec_title_buy:'買い約定', trade_exec_title_sell:'売り約定',
+    trade_exec_done_buy:'✅ 買い完了!', trade_exec_done_sell:'✅ 売り完了!',
+    trade_exec_desc:'{name}({sym}) {qty}口 約定',
+    trade_qty_err:'数量を入力してください。',
+    trade_server_err:'サーバーエラー',
   },
   es: {
     login:'Iniciar sesión', signup:'Registrarse', username:'Usuario', password:'Contraseña',
@@ -1814,6 +1829,11 @@ const TRANSLATIONS = {
     mob_stocks_drawer:'📊 Lista de activos',
     mob_news_sheet:'📰 Noticias',
     notice_panel_empty:'Todavía no hay avisos.',
+    trade_exec_title_buy:'Compra ejecutada', trade_exec_title_sell:'Venta ejecutada',
+    trade_exec_done_buy:'✅ ¡Compra completada!', trade_exec_done_sell:'✅ ¡Venta completada!',
+    trade_exec_desc:'{name}({sym}) {qty} uds. ejecutadas',
+    trade_qty_err:'Introduce una cantidad.',
+    trade_server_err:'Error de servidor',
   },
 };
 
@@ -2113,6 +2133,15 @@ function applyLang(){
   // alert select options
   const alType=g('alType');
   if(alType){ alType.options[0].textContent=t('alert_target'); alType.options[1].textContent=t('alert_stop'); }
+  // 알림 자산 셀렉트 즉시 재빌드 (언어 변경 시 이름 갱신)
+  const alSym=g('alSym');
+  if(alSym&&Object.keys(assets).length){
+    const prev=alSym.value;
+    alSym.innerHTML='';
+    Object.entries(assets).forEach(([sym,a])=>{ const o=document.createElement('option');o.value=sym;o.textContent=`${assetLabel(sym,a.name)} (${sym})`;alSym.appendChild(o); });
+    alSym.value=prev||alSym.options[0]?.value||'';
+    renderAlertList();
+  }
   // 거래창 레이블
   const tradeTtl=g('tradeTtl'); if(tradeTtl) tradeTtl.textContent=t('trade_title');
   const tbyLbl=g('tbyLabel'); if(tbyLbl) tbyLbl.textContent=t('trade_buy');
@@ -2161,6 +2190,18 @@ function applyLang(){
   // 모바일 종목/뉴스 드로어 제목
   const mobDrawerLbl=g('mobDrawerStocksLbl'); if(mobDrawerLbl) mobDrawerLbl.textContent=t('mob_stocks_drawer');
   const mobNewsSect=g('mobNewsSectLabel'); if(mobNewsSect) mobNewsSect.textContent=t('mob_news_sheet');
+  // 게시판 빈 메시지 즉시 갱신
+  const bEmptyMsg=g('boardEmptyMsg'); if(bEmptyMsg) bEmptyMsg.textContent=t('board_empty');
+  // 랭킹 캐시 즉시 재렌더 (API 재호출 없이)
+  if(typeof _lastRankData!=='undefined'&&_lastRankData) renderRanking(_lastRankData);
+  // 프로필 모달 열린 상태면 온라인/오프라인 라벨 갱신
+  const profOv=g('profileOv');
+  if(profOv&&profOv.style.display!=='none'){
+    const onlineLbl=g('profileOnlineLabel');
+    if(onlineLbl) onlineLbl.textContent=onlineLbl.dataset.online==='1'?t('online'):t('offline');
+    const profCBtn=g('profileChatBtn'); if(profCBtn) profCBtn.textContent=t('profile_chat_btn');
+    const profRBtn=g('profileReportBtn'); if(profRBtn) profRBtn.textContent=t('profile_report_btn');
+  }
   if(Object.keys(assets).length){
     buildSB(); buildTSel(); buildAdmSel(); updTicker(); updCH(); updBal();
     loadTx(); loadNotices(); renderNewsFeed();
@@ -3744,15 +3785,16 @@ function setAct(a){ trAct=a;g('tby').classList.toggle('on',a==='buy');g('tsl').c
 function updTP(){ const a=assets[trSym];if(!a)return;g('tpr').value=fmt(a.price)+t('krw_unit');calcT(); }
 function calcT(){ const q=parseFloat(g('tamt')?.value)||0;if(g('ttot'))g('ttot').textContent=fmtI(Math.round((assets[trSym]?.price||0)*q))+t('krw_unit'); }
 async function doTrade(){
-  const q=parseFloat(g('tamt').value);if(!q||q<=0){tMsg('수량을 입력하세요.',true);return;}
+  const q=parseFloat(g('tamt').value);if(!q||q<=0){tMsg(t('trade_qty_err'),true);return;}
   const r=await POST(`${API}/trade`,{symbol:trSym,action:trAct,amount:q});
-  if(!r){tMsg('서버 오류',true);return;} if(r.error){tMsg(r.error,true);return;}
-  tMsg(`✅ ${trAct==='buy'?'매수':'매도'} 완료!`,false); me.bal=r.bal;g('tamt').value='';calcT();
+  if(!r){tMsg(t('trade_server_err'),true);return;} if(r.error){tMsg(r.error,true);return;}
+  tMsg(trAct==='buy'?t('trade_exec_done_buy'):t('trade_exec_done_sell'),false); me.bal=r.bal;g('tamt').value='';calcT();
   const pref=loadNotiPref();
   if(pref.trade){
     const aName=assetLabel(trSym, assets[trSym]?.name||trSym);
-    if(trAct==='buy') showToast('buy','📈','매수 체결',`${aName}(${trSym}) ${q}주 체결`);
-    else              showToast('sell','📉','매도 체결',`${aName}(${trSym}) ${q}주 체결`);
+    const desc=t('trade_exec_desc').replace('{name}',aName).replace('{sym}',trSym).replace('{qty}',q);
+    if(trAct==='buy') showToast('buy','📈',t('trade_exec_title_buy'),desc);
+    else              showToast('sell','📉',t('trade_exec_title_sell'),desc);
   }
   if(pref.sound){ if(trAct==='buy') playBuy(); else playSell(); }
 }
@@ -4012,10 +4054,9 @@ function closeMobAll(){
 const _rankUsers={}; // id -> {username, displayName}
 function _rankChat(id){ const u=_rankUsers[id]; if(u) openChat(u.username, u.displayName); }
 function _rankProfile(id){ const u=_rankUsers[id]; if(u) openProfile(u.username, u.displayName); }
-async function loadRanking(){
+let _lastRankData=null;
+function renderRanking(d){
   const el=g('rankList');if(!el)return;
-  el.innerHTML=`<div style="color:var(--mu);text-align:center;padding:20px;font-size:12px">${t('ranking_loading')}</div>`;
-  const d=await GET(`${API}/ranking`);
   if(!d||!Array.isArray(d)){el.innerHTML=`<div style="color:var(--mu);text-align:center;padding:20px">${t('ranking_fail')}</div>`;return;}
   if(!d.length){el.innerHTML=`<div style="color:var(--mu);text-align:center;padding:20px">${t('ranking_empty')}</div>`;return;}
   const top=d[0].total||1;const medals=['🥇','🥈','🥉'];const nCls=['gold','silver','bronze'];const myU=me?.username||'';
@@ -4036,6 +4077,13 @@ async function loadRanking(){
     </div>`;
   }).join('');
   if(g('rankUpd'))g('rankUpd').textContent=t('ranking_updated')+new Date().toLocaleTimeString(loc());
+}
+async function loadRanking(){
+  const el=g('rankList');if(!el)return;
+  el.innerHTML=`<div style="color:var(--mu);text-align:center;padding:20px;font-size:12px">${t('ranking_loading')}</div>`;
+  const d=await GET(`${API}/ranking`);
+  _lastRankData=d;
+  renderRanking(d);
 }
 
 /* ── 공지 ── */
@@ -4427,9 +4475,10 @@ async function openProfile(username, displayName){
   if(user){
     dot.className='rank-online-dot '+(user.online?'on':'off');
     lbl.textContent=user.online?t('online'):t('offline');
+    lbl.dataset.online=user.online?'1':'0';
     tot.textContent=fmtI(user.total)+t('krw_unit');
   } else {
-    dot.className='rank-online-dot off'; lbl.textContent=t('offline'); tot.textContent='-';
+    dot.className='rank-online-dot off'; lbl.textContent=t('offline'); lbl.dataset.online='0'; tot.textContent='-';
   }
   g('profileOv').style.display='flex';
 }
